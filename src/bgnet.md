@@ -143,118 +143,124 @@ programación en red.
 Y, todavía más: finalmente me puse al día con el futuro (justo a tiempo)
 y ¡actualicé la Guía para IPv6! ¡Que la disfrutes!
 
-## Audience
+## Público
 
-This document has been written as a tutorial, not a complete reference.
-It is probably at its best when read by individuals who are just
-starting out with socket programming and are looking for a foothold. It
-is certainly not the _complete and total_ guide to sockets programming,
-by any means.
+Este documento fue escrito como un tutorial, no como una referencia
+completa. Probablemente lo aprovechen mejor quienes estén empezando a
+programar con sockets y estén buscando un punto de apoyo. Bajo ningún
+punto de vista es la gúia _completa y total_ de programación de
+sockets.
 
-Hopefully, though, it'll be just enough for those man pages to start
-making sense... `:-)`
-
-
-## Platform and Compiler
-
-The code contained within this document was compiled on a Linux PC using
-Gnu's [ix[compilers!gcc]] `gcc` compiler. It should, however, build on
-just about any platform that uses `gcc`. Naturally, this doesn't apply
-if you're programming for Windows---see the [section on Windows
-programming](#windows), below.
+Dicho esto, con algo de suerte es más que suficiente como para que esas
+páginas del `man` empiecen a tener sentido... `:-)`
 
 
-## Official Homepage and Books For Sale
+## Plataforma y compilador
 
-This official location of this document is:
+El código contenido en este documento fue compilado en una PC con Linux,
+usando el compilador Gnu's [ix[compilers!gcc]] `gcc`. Debería, de todos
+modos, compilar en cualquier otra plataforma que use `gcc`.
+Naturalmente, esto no aplica si estás programando para Windows - fijate
+la [sección sobre programación en Windows](#windows), más abajo.
+
+
+## Página oficial y libros a la venta
+
+La ubicación oficial de la versión original en inglés de este documento
+es:
 
 * [`https://beej.us/guide/bgnet/`](https://beej.us/guide/bgnet/)
 
-There you will also find example code and translations of the guide into
-various languages.
+Ahí también podés encontrar ejemplos de código y traducciones de esta
+guía a varios idiomas.
 
-To buy nicely bound print copies (some call them "books"), visit:
+Para comprar una bonita copia impresa (hay quienes las llaman "libros"),
+visitá:
 
 * [`https://beej.us/guide/url/bgbuy`](https://beej.us/guide/url/bgbuy)
 
-I'll appreciate the purchase because it helps sustain my
-document-writing lifestyle!
+Te agradeceré la compra, porque me ayuda a sostener mi estilo de vida
+de escritor de documentación.
 
+Esta traducción en español está en:
 
-## Note for Solaris/SunOS Programmers {#solaris}
+* [`https://mgarciaisaia.github.io/bgnet-spanish/`](https://mgarciaisaia.github.io/bgnet-spanish/)
 
-When compiling for [ix[Solaris]] Solaris or [ix[SunOS]] SunOS, you need
-to specify some extra command-line switches for linking in the proper
-libraries. In order to do this, simply add "`-lnsl -lsocket -lresolv`"
-to the end of the compile command, like so:
+## Nota para programadores Solaris/SunOS {#solaris}
+
+Al compilar para [ix[Solaris]] Solaris o [ix[SunOS]] SunOS, necesitás
+especificar algunos parámetros extra en la línea de comandos para
+linkear las bibliotecas correspondientes. Para hacerlo, simplemente
+agregá "`-lnsl -lsocket -lresolv`" al final de cada comando de
+compilación, así:
 
 ```
 $ cc -o server server.c -lnsl -lsocket -lresolv
 ```
 
-If you still get errors, you could try further adding a `-lxnet` to the
-end of that command line. I don't know what that does, exactly, but some
-people seem to need it.
+Si aún así obtenés errores, probá agregándole también un `-lxnet` al
+final de eso. No sé qué es lo que hace exactamente, pero parece que
+algunas personas lo necesitan.
 
-Another place that you might find problems is in the call to
-`setsockopt()`. The prototype differs from that on my Linux box, so
-instead of:
+También podrías tener problemas en las llamadas a `setsockopt()`. El
+prototipo difiere del de mi máquina Linux, así que en lugar de:
 
 ```{.c}
 int yes=1;
 ```
 
-enter this:
+Poné esto:
 
 ```{.c}
 char yes='1';
 ```
 
-As I don't have a Sun box, I haven't tested any of the above
-information---it's just what people have told me through email.
+Como no tengo una máquina Sun, no pude probar nada de esta información -
+es, simplemente, lo que algunas personas me dijeron por email.
 
 
-## Note for Windows Programmers {#windows}
+## Nota para programadores Windows {#windows}
 
-At this point in the guide, historically, I've done a bit of bagging on
-[ix[Windows]] Windows, simply due to the fact that I don't like it very
-much. But I should really be fair and tell you that Windows has a huge
-install base and is obviously a perfectly fine operating system.
+En este punto en la guía, históricamente le pegaba un poco a
+[ix[Windows]] Windows, simplemente porque no me gusta demasiado. Pero
+debo ser justo y decirte que Windows tiene una base de usuari@s enorme,
+y obviamente es un sistema operativo perfectamente usable.
 
-They say absence makes the heart grow fonder, and in this case, I
-believe it to be true. (Or maybe it's age.) But what I can say is that
-after a decade-plus of not using Microsoft OSes for my personal work,
-I'm much happier! As such, I can sit back and safely say, "Sure, feel
-free to use Windows!"  ...Ok yes, it does make me grit my teeth to say
-that.
+Dicen que la ausencia hace crecer el cariño, y, en este caso, creo que
+es cierto (o quizá es la edad). Pero lo que puedo decir es que después
+de más de una década de no usar sistemas operativos de Microsoft para mi
+trabajo personal, ¡soy mucho más feliz! Tal es así que puedo relajarme y
+decir tranquilamente "Sí, ¡sentite libre de usar Windows!"... Ok, sí -
+no puedo evitar decirlo apretando los dientes.
 
-So I still encourage you to try [ix[Linux]]
-[fl[Linux|https://www.linux.com/]], [fl[BSD|https://bsd.org/]], or some
-flavor of Unix, instead.
+Así que sigo alentándote a probar [ix[Linux]]
+[fl[Linux|https://www.linux.com/]], [fl[BSD|https://bsd.org/]], o
+cualquier otra versión de Unix, en cambio.
 
-But people like what they like, and you Windows folk will be pleased to
-know that this information is generally applicable to you guys, with a
-few minor changes, if any.
+Pero a cada persona le gusta lo que le gusta, y a ustedes, personas de
+Windows, les encantará saber que esta información también vale para
+ustedes en general, a veces con algunos cambios menores.
 
-One cool thing you can do is install [ix[Cygwin]]
-[fl[Cygwin|https://cygwin.com/]], which is a collection of Unix tools
-for Windows. I've heard on the grapevine that doing so allows all these
-programs to compile unmodified.
+Una cosa copada que podés hacer es instalar [ix[Cygwin]]
+[fl[Cygwin|https://cygwin.com/]], que es una colección de herramientas
+de Unix para Windows. Escuché por ahí que usándolo, todos estos
+programas compilan sin modificaciones.
 
-Another thing that you should consider is [ix[WSL]] [ix[Windows
-Subsystem For Linux]] the [fl[Windows Subsystem for
-Linux|https://docs.microsoft.com/en-us/windows/wsl/about]]. This
-basically allows you to install a Linux VM-ish thing on Windows 10. That
-will also definitely get you situated.
+Otra cosa que deberías evaluar es [ix[WSL]] [ix[Windows Subsystem For
+Linux]] el [fl[Windows Subsystem for
+Linux|https://docs.microsoft.com/en-us/windows/wsl/about]]. Esto te
+permite básicamente instalar algo como una máquina virtual de Linux en
+Windows 10. Con eso, definitivamente deberías estar bien.
 
-But some of you might want to do things the Pure Windows Way. That's
-very gutsy of you, and this is what you have to do: run out and get Unix
-immediately! No, no---I'm kidding. I'm supposed to be
-Windows-friendly(er) these days...
+Pero hay quienes querrán hacer las cosas en la Forma Pura de Windows. Es
+algo muy valiente de su parte, y esto es lo que deberías hacer: ¡salí
+corriendo y conseguite un Unix inmediatamente! No, no - era un chiste.
+Se supone que debería ser más amistoso con Windows estos días...
 
-This is what you'll have to do (unless you install
-[Cygwin](https://cygwin.com/)!): first, ignore pretty much all of the
-system header files I mention in here. All you need to include is:
+Esto es lo que vas a tener que hacer (¡a menos que quieras instalar
+[Cygwin](https://cygwin.com/)!): primero que nada, ignorá prácticamente
+todos los headers de archivos de sistema que menciono acá. Todo lo que
+necesitás incluir (`#include`) es:
 
 [ix[Winsock]]
 
@@ -262,18 +268,18 @@ system header files I mention in here. All you need to include is:
 #include <winsock.h>
 ```
 
-Wait! You also have to make a call to [ixtt[WSAStartup()]]
-`WSAStartup()` before doing anything else with the sockets library. The
-code to do that looks something like this:
+¡Esperá! También vas a tener que llamar a [ixtt[WSAStartup()]]
+`WSAStartup()` antes de hacer cualquier otra cosa con la biblioteca de
+sockets. El código para hacerlo tiene esta pinta:
 
 ```{.c .numberLines}
 #include <winsock.h>
 
 {
-    WSADATA wsaData;   // if this doesn't work
-    //WSAData wsaData; // then try this instead
+    WSADATA wsaData;   // si esto no funciona
+    //WSAData wsaData; // proba esto otro en cambio
 
-    // MAKEWORD(1,1) for Winsock 1.1, MAKEWORD(2,0) for Winsock 2.0:
+    // MAKEWORD(1,1) para Winsock 1.1, MAKEWORD(2,0) para Winsock 2.0:
 
     if (WSAStartup(MAKEWORD(1,1), &wsaData) != 0) {
         fprintf(stderr, "WSAStartup failed.\n");
@@ -281,40 +287,42 @@ code to do that looks something like this:
     }
 ```
 
-You also have to tell your compiler to link in the Winsock library,
-usually called `wsock32.lib` or `winsock32.lib`, or `ws2_32.lib` for
-Winsock 2.0. Under VC++, this can be done through the `Project` menu,
-under `Settings...`. Click the `Link` tab, and look for the box titled
-"Object/library modules". Add "wsock32.lib" (or whichever lib is your
-preference) to that list.
+También tenés que decirle a tu compilador que linkee la biblioteca
+Winsock, en general llamada `wsock32.lib` o `winsock32.lib`, o
+`ws2_32.lib` para Winsock 2.0. En VC++, esto lo hacés en el menú
+`Project`, dentro de `Settings...`. Clickeá la pestaña `Link`, y buscá
+la caja titulada "Object/library modules". Agregá "wsock32.lib" (o la
+biblioteca que prefieras) a esa lista.
 
-Or so I hear.
+O así dicen.
 
-Finally, you need to call [ixtt[WSACleanup()]] `WSACleanup()` when
-you're all through with the sockets library. See your online help for
-details.
+Por último, tenés que llamar a [ixtt[WSACleanup()]] `WSACleanup()`
+cuando termines de usar los sockets. Consultá tu ayuda online para más
+detalles.
 
-Once you do that, the rest of the examples in this tutorial should
-generally apply, with a few exceptions. For one thing, you can't use
-`close()` to close a socket---you need to use [ixtt[closesocket()]]
-`closesocket()`, instead. Also, [ixtt[select()]] `select()` only works
-with socket descriptors, not file descriptors (like `0` for `stdin`).
+Una vez hecho esto, el resto de los ejemplos en este tutorial deberían
+funcionar en general, con algunas excepciones. Por ejemplo, no podés
+usar `close()` para cerrar un socket - tenés que usar
+[ixtt[closesocket()]] `closesocket()` en su lugar. Además,
+[ixtt[select()]] `select()` sólo funciona con descriptores que sean
+sockets, y no con archivos (como `0` para `stdin`).
 
-There is also a socket class that you can use, [ixtt[CSocket]]
-`CSocket`. Check your compilers help pages for more information.
+También podés usar una clase de sockets, [ixtt[CSocket]] `CSocket`.
+Consultá la documentación de tu compilador para más información.
 
-To get more information about Winsock, read the [ix[Winsock!FAQ]]
-[fl[Winsock FAQ|https://tangentsoft.net/wskfaq/]] and go from there.
+Para más información sobre Winsock, leé las [ix[Winsock!FAQ]]
+[fl[Preguntas frecuentes de Winsock|https://tangentsoft.net/wskfaq/]] y
+andá viendo.
 
-Finally, I hear that Windows has no [ixtt[fork()]] `fork()` system call
-which is, unfortunately, used in some of my examples. Maybe you have to
-link in a POSIX library or something to get it to work, or you can use
-[ixtt[CreateProcess()]] `CreateProcess()` instead.  `fork()` takes no
-arguments, and `CreateProcess()` takes about 48 billion arguments. If
-you're not up to that, the [ixtt[CreateThread()]] `CreateThread()` is a
-little easier to digest...unfortunately a discussion about
-multithreading is beyond the scope of this document. I can only talk
-about so much, you know!
+Finalmente, escuché que Windows no tiene una system call [ixtt[fork()]]
+`fork()`, que, lamentablemente, uso en algunos de mis ejemplos. Quizá
+tengas que linkear alguna biblioteca POSIX o algo así para que hacerlos
+funcionar, o podés usar [ixtt[CreateProcess()]] `CreateProcess()` en su
+lugar. `fork()` no recibe parámetros, y `CreateProcess()` recibe algo
+así como 48 mil millones de parámetros. Si eso no es lo tuyo,
+[ixtt[CreateThread()]] `CreateThread()` es algo más sencilla de usar...
+Lamentablemente, discutir sobre multithreading está más allá del alcance
+de este documento. ¡No puedo hablar de todo!
 
 
 ## Email Policy
