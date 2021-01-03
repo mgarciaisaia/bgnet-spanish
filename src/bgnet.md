@@ -126,22 +126,22 @@ you, Knuth, but... daaahm.
 [nh[addrinfo]]
 [nh[closesocket]]
 
-# Intro
+# Introducción
 
-Hey! Socket programming got you down? Is this stuff just a little too
-difficult to figure out from the `man` pages? You want to do cool
-Internet programming, but you don't have time to wade through a gob of
-`struct`s trying to figure out if you have to call `bind()` before you
-`connect()`, etc., etc.
+¡Hey! ¿Te frustra la programación con sockets? ¿Te parece que es
+demasiado complejo como para entenderlo con las páginas del `man`?
+¿Querés programar cosas copadas con la Internet, pero no tenés tiempo
+de cruzarte mil `struct`s tratando de entender si tenés que llamar a
+`bind()` antes que a `connect()`, y demás?
 
-Well, guess what! I've already done this nasty business, and I'm dying
-to share the information with everyone! You've come to the right place.
-This document should give the average competent C programmer the edge
-s/he needs to get a grip on this networking noise.
+Bueno, ¡adiviná! Yo ya pasé por todo ese proceso horrible, ¡y muero por
+compartir esa información con todo el mundo! Viniste al lugar correcto.
+Este documento debería darle a cualquier persona que programe en C
+competentemente la cancha que necesita para entender todo esto de la
+programación en red.
 
-And check it out: I've finally caught up with the future (just in the
-nick of time, too!) and have updated the Guide for IPv6! Enjoy!
-
+Y, todavía más: finalmente me puse al día con el futuro (justo a tiempo)
+y ¡actualicé la Guía para IPv6! ¡Que la disfrutes!
 
 ## Audience
 
