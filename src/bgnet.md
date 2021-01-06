@@ -325,124 +325,128 @@ Lamentablemente, discutir sobre multithreading está más allá del alcance
 de este documento. ¡No puedo hablar de todo!
 
 
-## Email Policy
+## Política de emails
 
-I'm generally available to help out with [ix[email to Beej]] email
-questions so feel free to write in, but I can't guarantee a response. I
-lead a pretty busy life and there are times when I just can't answer a
-question you have. When that's the case, I usually just delete the
-message. It's nothing personal; I just won't ever have the time to give
-the detailed answer you require.
+Estoy disponible para ayudar con [ix[email to Beej]] preguntas por email
+así que sentite libre de escribirme, pero no puedo garantizar una
+respuesta. Tengo una vida bastante ocupada, y hay veces en que
+simplemente no puedo contestarte preguntas. En esos casos, generalmente
+borro el mensaje. No es nada personal: simplemente nunca voy a tener el
+tiempo de darte la respuesta detallada que necesitás.
 
-As a rule, the more complex the question, the less likely I am to
-respond. If you can narrow down your question before mailing it and be
-sure to include any pertinent information (like platform, compiler,
-error messages you're getting, and anything else you think might help me
-troubleshoot), you're much more likely to get a response. For more
-pointers, read ESR's document, [fl[How To Ask Questions The Smart
+Como regla, mientras más compleja sea la pregunta, menos probable es que
+vaya contestarla. Si podés acotar tu pregunta antes de enviarla, y te
+asegurás de incluir toda la información relevante (como plataforma,
+compilador, mensajes de error que estás recibiendo, y cualquier otra
+cosa que creas que pueda ayudarme a entender el problema), más probable
+es que consigas una respuesta. Para más indicaciones, leé el documento
+de ESR, [fl[How To Ask Questions The Smart
 Way|http://www.catb.org/~esr/faqs/smart-questions.html]].
 
-If you don't get a response, hack on it some more, try to find the
-answer, and if it's still elusive, then write me again with the
-information you've found and hopefully it will be enough for me to help
-out.
+Si no conseguís una respuesta, seguí intentándolo un poco más, tratá de
+encontrar tu respuesta, y si se te sigue escapando, volvé a escribirme
+con la nueva información que tengas, y con algo de suerte alcance para
+que esta vez te pueda ayudar.
 
-Now that I've badgered you about how to write and not write me, I'd just
-like to let you know that I _fully_ appreciate all the praise the guide
-has received over the years. It's a real morale boost, and it gladdens
-me to hear that it is being used for good! `:-)` Thank you!
+Tras fastidiarte diciéndote cómo sí y cómo no escribirme, quiero que
+sepas que _realmente_ aprecio todos los elogios que esta guía recibió a
+lo largo de estos años. Es un gran empujón a la moral, y me alegra saber
+que se está usando. `:-)` ¡Gracias!
 
 
-## Mirroring
+## Mirroring (réplicas)
 
-[ix[mirroring]] You are more than welcome to mirror this site, whether
-publicly or privately. If you publicly mirror the site and want me to
-link to it from the main page, drop me a line at
+[ix[mirroring]] Son más que bienvenidas las réplicas de este sitio,
+tanto las públicas como las privadas. Si querés publicar una réplica
+pública del sitio y que la enlace desde la página principal, escribime a
 [`beej@beej.us`](beej@beej.us).
 
 
-## Note for Translators
+## Nota para traductores
 
-[ix[translations]] If you want to translate the guide into another
-language, write me at [`beej@beej.us`](beej@beej.us) and I'll link to
-your translation from the main page. Feel free to add your name and
-contact info to the translation.
+[ix[translations]] Si querés traducir esta guía a otro idioma, escribime
+a [`beej@beej.us`](beej@beej.us) y enlazo a tu traducción desde la
+página principal. Sentite libre de agregar tu nombre y datos de contacto
+a la traducción.
 
-This source markdown document uses UTF-8 encoding.
+Este documento markdown fuente usa codificación UTF-8.
 
-Please note the license restrictions in the [Copyright, Distribution,
-and Legal](#legal) section, below.
+Por favor, prestá atención a las restricciones de la licencia en la
+sección [Copyright, distribución y legales](#legal) más abajo.
 
-If you want me to host the translation, just ask. I'll also link to it
-if you want to host it; either way is fine.
+Si querés que hostee la traducción, avisame. También puedo linkearla si
+preferís hostearla vos - cualquier opción me funciona igual.
 
 
-## Copyright, Distribution, and Legal {#legal}
+## Copyright, distribución, y legales {#legal}
 
-Beej's Guide to Network Programming is Copyright © 2019 Brian "Beej
+La Beej's Guide to Network Programming es Copyright © 2019 Brian "Beej
 Jorgensen" Hall.
 
-With specific exceptions for source code and translations, below, this
-work is licensed under the Creative Commons Attribution- Noncommercial-
-No Derivative Works 3.0 License. To view a copy of this license, visit
+Con las excepciones específicas del código fuente y las traducciones,
+detalladas debajo, este trabajo está licenciado bajo la licencia
+Creative Commons Attribution- Noncommercial- No Derivative Works 3.0.
+Para ver una copia de la licencia, visita
 
 [`https://creativecommons.org/licenses/by-nc-nd/3.0/`](https://creativecommons.org/licenses/by-nc-nd/3.0/)
 
-or send a letter to Creative Commons, 171 Second Street, Suite 300, San
+o envía una carta a Creative Commons, 171 Second Street, Suite 300, San
 Francisco, California, 94105, USA.
 
-One specific exception to the "No Derivative Works" portion of the
-license is as follows: this guide may be freely translated into any
-language, provided the translation is accurate, and the guide is
-reprinted in its entirety. The same license restrictions apply to the
-translation as to the original guide. The translation may also include
-the name and contact information for the translator.
+Una excepción específica a la porción "No Derivative Works" (No Obras
+Derivadas) de la licencia es la siguiente: esta guía puede ser traducida
+libremente a cualquier idioma, siempre que la traducción sea precisa, y
+la guía sea reimpresa en su totalidad. Las mismas restricciones de la
+licencia que aplican a la obra original también aplican a las
+traducciones. Las traducciones también pueden incluir el nombre y datos
+de contacto de quien las traduzca.
 
-The C source code presented in this document is hereby granted to the
-public domain, and is completely free of any license restriction.
+Por la presente, se otorga al dominio público el código fuente C
+presentado en este documento, dejándolo completamente libre de cualquier
+restricción de licencia.
 
-Educators are freely encouraged to recommend or supply copies of this
-guide to their students.
+Se alienta libremente a que los y las educadores recomienden o provean
+copias de este documento a sus estudiantes.
 
-Unless otherwise mutually agreed by the parties in writing, the author
-offers the work as-is and makes no representations or warranties of any
-kind concerning the work, express, implied, statutory or otherwise,
-including, without limitation, warranties of title, merchantibility,
-fitness for a particular purpose, noninfringement, or the absence of
-latent or other defects, accuracy, or the presence of absence of errors,
-whether or not discoverable.
+Exceptuando acuerdos por escrito entre ambas partes, el autor ofrece
+esta obra "como es", no haciendo representación o garantía alguna de
+ningún tipo respecto a la obra, expresa, implícita, legal o de otro
+tipo, incluyendo, pero sin limitarse a, garantías de título,
+comerciabilidad, idoneidad para un propósito particular, no infracción,
+o la ausencia de defectos latentes o de otro tipo, precisión, o
+presencia de ausencia de errores, ya sea detectables o no.
 
-Except to the extent required by applicable law, in no event will the
-author be liable to you on any legal theory for any special, incidental,
-consequential, punitive or exemplary damages arising out of the use of
-the work, even if the author has been advised of the possibility of such
-damages.
+Excepto en la medida requerida por la ley aplicable, en ningún caso el
+autor será responsable ante usted en cualquier teoría legal por
+cualquier daño especial, incidental, consecuentes, punitivo o ejemplar
+que surja del uso de este trabajo, incluso si el autor ha sido advertido
+de la posibilidad de tales daños.
 
-Contact [`beej@beej.us`](mailto:beej@beej.us) for more information.
-
-
-## Dedication
-
-Thanks to everyone who has helped in the past and future with me getting
-this guide written. And thank you to all the people who produce the Free
-software and packages that I use to make the Guide: GNU, Linux,
-Slackware, vim, Python, Inkscape, pandoc, many others. And finally a big
-thank-you to the literally thousands of you who have written in with
-suggestions for improvements and words of encouragement.
-
-I dedicate this guide to some of my biggest heroes and inpirators in the
-world of computers: Donald Knuth, Bruce Schneier, W. Richard Stevens,
-and The Woz, my Readership, and the entire Free and Open Source Software
-Community.
+Contacta a [`beej@beej.us`](mailto:beej@beej.us) para más información.
 
 
-## Publishing Information
+## Dedicación
 
-This book is written in Markdown using the vim editor on an Arch Linux
-box loaded with GNU tools. The cover "art" and diagrams are produced
-with Inkscape.  The Markdown is converted to HTML and LaTex/PDF by
-Python, Pandoc and XeLaTeX, using Liberation fonts. The toolchain is
-composed of 100% Free and Open Source Software.
+Gracias a cada persona que haya ayudado en el pasado y en el futuro a
+que escriba esta guía. Y gracias a todas las personas que producen los
+paquetes y programas libres que usé para hacer esta guía: GNU, Linux,
+Slackware, vim, Python, Inkscape, pandoc, y varios otros. Y, finalmente,
+un gran gracias a los (literalmente) miles de ustedes que me han escrito
+con sugerencias para mejoras y palabras de aliento.
+
+Dedico esta guía a algunos de mis mayores héroes e inspiraciones en el
+mundo de las computadoras: Donald Knuth, Bruce Schneier, W. Richard
+Stevens, y a Woz, mis lectores y lectoras, y a la comunidad del software
+libre y de código abierto en su totalidad.
+
+
+## Información sobre la publicación
+
+Este libro fue escrito en Markdown usando el editor vim en una máquina
+Arch Linux con herramientas GNU. El "arte" de tapa y los diagramas
+fueron hechos con Inkscape. El Markdown se convierte a HTML y LaTex/PDF
+con Python, Pandoc y XeLaTex, usando las tipografías Liberation. Toda la
+cadena está compuesta por 100% software libre y de código abierto.
 
 
 # What is a socket?
