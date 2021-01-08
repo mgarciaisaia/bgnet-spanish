@@ -449,46 +449,49 @@ con Python, Pandoc y XeLaTex, usando las tipografías Liberation. Toda la
 cadena está compuesta por 100% software libre y de código abierto.
 
 
-# What is a socket?
+# ¿Qué es un socket?
 
-You hear talk of [ix[socket]] "sockets" all the time, and perhaps you
-are wondering just what they are exactly. Well, they're this: a way to
-speak to other programs using standard Unix [ix[file descriptor]] file
-descriptors.
+Escuchás hablar de [ix[socket]] "sockets" (_enchufes_) todo el tiempo, y
+quizá te estés preguntando qué es lo que son exactamente. Bueno, esto
+son: una forma de hablar con otros programas usando
+[ix[file descriptor]] descriptores de archivos estándar de Unix.
 
-What?
+¿Qué?
 
-Ok---you may have heard some Unix hacker state, "Jeez, _everything_ in
-Unix is a file!" What that person may have been talking about is the
-fact that when Unix programs do any sort of I/O, they do it by reading
-or writing to a file descriptor. A file descriptor is simply an integer
-associated with an open file. But (and here's the catch), that file can
-be a network connection, a FIFO, a pipe, a terminal, a real on-the-disk
-file, or just about anything else.  Everything in Unix _is_ a file! So
-when you want to communicate with another program over the Internet
-you're gonna do it through a file descriptor, you'd better believe it.
+Ok - quizá hayas escuchado a algún/alguna hacker Unix decir "¡En Unix,
+_todo_ es un archivo!". A lo que puede que se haya estado refiriendo esa
+persona es a que cuando un programa Unix hace cualquier tipo de E/S, lo
+hace leyendo o escribiendo un descriptor de archivo. Un descriptor de
+archivo es simplemente un número entero (un `int`) asociado a un archvo
+abierto. Pero (y acá está el truco) ese archivo puede ser una conexión
+de red, una cola FIFO, un pipe (_tubería_), una terminal, un archivo
+"real" en el disco, o cualquier otra cosa. ¡Todo en Unix _es_ un
+archivo! Así que cuando te quieras comunicar con otro programa a través
+de Internet, lo vas a hacer a través de un descriptor de archivos, lo
+creas o no.
 
-"Where do I get this file descriptor for network communication, Mr.
-Smarty-Pants?" is probably the last question on your mind right now, but
-I'm going to answer it anyway: You make a call to the [ixtt[socket()]]
-`socket()` system routine. It returns the [ix[socket descriptor]] socket
-descriptor, and you communicate through it using the specialized
-[ixtt[send()]] `send()` and [ixtt[recv()]] `recv()` ([`man
-send`](#sendman), [`man recv`](#recvman)) socket calls.
+Puede que en este preciso instante te estés preguntando "¿Y de dónde
+saco este descriptor de archivos para comunicación por red, Don
+Sabelotodo?" - y, si no, lo voy a contestar de todos modos: llamando a
+la rutina de sistema [ixtt[socket()]] `socket()`. Te devuelve el
+[ix[socket descriptor]] descriptor de socket, y te comunicás a través de
+él usando las llamdas a sistema especializadas para sockets
+[ixtt[send()]] `send()` y [ixtt[recv()]] `recv()` ([`man
+send`](#sendman), [`man recv`](#recvman)).
 
-"But, hey!" you might be exclaiming right about now. "If it's a file
-descriptor, why in the name of Neptune can't I just use the normal
-[ixtt[read()]] `read()` and [ixtt[write()]] `write()` calls to
-communicate through the socket?"  The short answer is, "You can!"  The
-longer answer is, "You can, but [ixtt[send()]] `send()` and [ixtt[recv()]]
-`recv()` offer much greater control over your data transmission."
+"Pero, ¡hey!" puede que estés exclamando en este momento. "Si es un
+descriptor de archivos, ¿por qué demonios no puedo simplemente usar las
+llamadas [ixtt[read()]] `read()` y [ixtt[write()]] `write()` normales
+para comunicarme a través del socket?". Y la respuesta corta es "Podés,
+pero [ixtt[send()]] `send()` y [ixtt[recv()]] `recv()` te ofrecen mucho
+mayor control sobre la transmisión de datos."
 
-What next? How about this: there are all kinds of sockets. There are
-[ix[socket!types]] DARPA Internet addresses (Internet Sockets), path
-names on a local node (Unix Sockets), CCITT X.25 addresses (X.25 Sockets
-that you can safely ignore), and probably many others depending on which
-Unix flavor you run.  This document deals only with the first: Internet
-Sockets.
+¿Qué sigue? Esto: hay montones de tipos de sockets. Hay
+[ix[socket!types]] direcciones de Internet DARPA (sockets de Internet),
+nombres de ruta en un nodo local (sockets Unix), direcciones CCITT X.25
+(sockets X.25, que tranquilamente podés ignorar), y probabemente muchos
+otros tipos dependiendo del sabor de Unix que estés ejecutando. Este
+documento sólo se encarga de los primeros: sockets de Internet.
 
 
 ## Two Types of Internet Sockets
