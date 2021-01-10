@@ -676,93 +676,95 @@ blah blah_. Revisá la [flrfc[IP RFC|791]] si realmente te interesa. Si
 nunca aprendés sobre ello, meh, vas a sobrevivir igual.
 
 
-# IP Addresses, `struct`s, and Data Munging
+# Direcciones IP, `struct`s y manejo de datos
 
-Here's the part of the game where we get to talk code for a change.
+Esta es la parte del juego en la que empezamos a hablar de código, para
+variar.
 
-But first, let's discuss more non-code! Yay! First I want to talk about
-[ix[IP]] IP addresses and ports for just a tad so we have that sorted
-out.  Then we'll talk about how the sockets API stores and manipulates
-IP addresses and other data.
+Pero antes, ¡charlemos más cosas que no son código! ¡Yay! Primero,
+quiero hablar de las [ix[IP]] direcciones y puertos IP por un momento,
+para entenderlo de entrada. Luego hablaremos sobre cómo la API de
+sockets almacena y manipula las direcciones IP y otros datos.
 
 
-## IP Addresses, versions 4 and 6
+## Direcciones IP, versiones 4 y 6
 
-In the good old days back when Ben Kenobi was still called Obi Wan
-Kenobi, there was a wonderful network routing system called The Internet
-Protocol Version 4, also called [ix[IPv4]] IPv4. It had addresses made
-up of four bytes (A.K.A.  four "octets"), and was commonly written in
-"dots and numbers" form, like so: `192.0.2.111`.
+En los viejos tiempos en que Ben Kenobi aún se llamaba Obi Wan Kenobi,
+había un sistema de de routeo de red maravilloso llamado El Protocolo
+Internet Versión 4, también llamado [ix[IPv4]] IPv4. Tenía direcciones
+conformadas por cuatro bytes (también conocidos como cuatro "octetos"),
+y eran comunmente escritas en forma de "números y puntos" ("dots and
+numbers"), como `192.0.2.111`.
 
-You've probably seen it around.
+Probablemente las hayas visto.
 
-In fact, as of this writing, virtually every site on the Internet uses
-IPv4.
+De hecho, mientras escribo esto, prácticamente todo sitio en Internet
+usa IPv4.
 
-Everyone, including Obi Wan, was happy. Things were great, until some
-naysayer by the name of Vint Cerf warned everyone that we were about to
-run out of IPv4 addresses!
+Tod@s, incluído Obi Wan, eran felices. Las cosas marchaban bien, hasta
+que algún detractor llamado Vint Cerf empezó a alertar que ¡nos
+estábamos por quedar sin direcciones IPv4!
 
-(Besides warning everyone of the Coming IPv4 Apocalypse Of Doom And
-Gloom, [ix[Vint Cerf]] [fl[Vint
-Cerf|https://en.wikipedia.org/wiki/Vint_Cerf]] is also well-known for
-being The Father Of The Internet. So I really am in no position to
-second-guess his judgment.)
+(Además de alertar a todo el mundo sobre la Venida del Apocalipsis de
+Destrucción y Obscuridad de IPv4, [ix[Vint Cerf]] [fl[Vint
+Cerf|https://en.wikipedia.org/wiki/Vint_Cerf]] también es reconocido por
+ser el Padre de la Internet. Así que no me veo en posición de poner en
+duda su juicio.)
 
-Run out of addresses? How could this be? I mean, there are like billions
-of IP addresses in a 32-bit IPv4 address. Do we really have billions of
-computers out there?
+¿Quedarse sin direcciones? ¿Cómo podría suceder esto? Digo, hay algo así
+como _miles de millones_ de direcciones IPv4 de 32-bit. ¿Realmente hay
+miles de millones de computadoras _ahí afuera_?
 
-Yes.
+Sí.
 
-Also, in the beginning, when there were only a few computers and
-everyone thought a billion was an impossibly large number, some big
-organizations were generously allocated millions of IP addresses for
-their own use. (Such as Xerox, MIT, Ford, HP, IBM, GE, AT&T, and some
-little company called Apple, to name a few.)
+Además, al principio, cuando sólo existían algunas pocas computadoras y
+a cualquiera le parecía que mil millones era un número inalcanzable, a
+algunas organizaciones grandes les asignaron generosamente millones de
+direcciones IP para su uso propio (algunas como Xerox, MIT, Ford, HP,
+IBM, GE, AT&T, y una empresita llamada Apple, para nombrar algunas).
 
-In fact, if it weren't for several stopgap measures, we would have run
-out a long time ago.
+De hecho, si no fuera por varias medidas provisionales, nos habríamos
+quedado sin direcciones hace rato ya.
 
-But now we're living in an era where we're talking about every human
-having an IP address, every computer, every calculator, every phone,
-every parking meter, and (why not) every puppy dog, as well.
+Pero ahora estamos viviendo en una era en la que cada ser humano tiene
+una dirección IP; cada computadora, cada calculadora, cada teléfono,
+cada parquímetro, y (¿por qué no?) cada cachorrito también.
 
-And so, [ix[IPv6]] IPv6 was born. Since Vint Cerf is probably immortal
-(even if his physical form should pass on, heaven forbid, he is probably
-already existing as some kind of hyper-intelligent
-[fl[ELIZA|https://en.wikipedia.org/wiki/ELIZA]] program out in the
-depths of the Internet2), no one wants to have to hear him say again "I
-told you so" if we don't have enough addresses in the next version of
-the Internet Protocol.
+Entonces nació [ix[IPv6]] IPv6. Dado que Vint Cerf probablemente sea
+inmortal (incluso si muriera en su forma física, Dios no lo permita,
+probablemente ya esté existiendo como alguna versión híper-inteligente
+del programa [fl[ELIZA|https://en.wikipedia.org/wiki/ELIZA]] en alguna
+parte de las profundidades de la Internet2), nadie quiere tener que
+volver a escucharlo decir "Se los dije" si nos quedamos sin direcciones
+en la próxima versión del protocolo Internet.
 
-What does this suggest to you?
+¿Qué te sugiere esto?
 
-That we need a _lot_ more addresses. That we need not just twice as many
-addresses, not a billion times as many, not a thousand trillion times as
-many, but _79 MILLION BILLION TRILLION times as many possible
-addresses!_  That'll show 'em!
+Que necesitamos _muchísimas_ más direcciones. Necesitamos no sólo dos
+veces las direcciones que tenemos, ni mil millones de veces, ni mil
+trillones de veces esa cantidad, si no _¡79 millones de billones de
+trillones la cantidad de direcciones que tenemos!_ ¡A ver si aprenden!
 
-You're saying, "Beej, is that true? I have every reason to disbelieve
-large numbers."  Well, the difference between 32 bits and 128 bits might
-not sound like a lot; it's only 96 more bits, right? But remember, we're
-talking powers here: 32 bits represents some 4 billion numbers (2^32^),
-while 128 bits represents about 340 trillion trillion trillion numbers
-(for real, 2^128^).  That's like a million IPv4 Internets for _every
-single star in the Universe_.
+Estarás diciendo "Beej, ¿es cierto esto? Tengo motivos para descreer de
+números tan grandes". Bueno, la diferencia entre 32 bits y 128 bits
+puede no sonar a mucho; son sólo 96 bits más, ¿no? Pero acordate,
+estamos hablando de potencias: 32 bits representa unos 4 mil millones de
+números (2^32^), mientras que 128 bits representa unos 340 trillones de
+trillones de trillones de números (en realidad, 2^128^). Eso es algo así
+como un millón de Internets IPv4 por _cada estrella en el Universo_.
 
-Forget this dots-and-numbers look of IPv4, too; now we've got a
-hexadecimal representation, with each two-byte chunk separated by a
-colon, like this:
+Olvidate de la pinta números-y-puntos de IPv4, también; ahora tenemos
+una representación hexadecimal, con cada par de bytes separado por dos
+puntos, así:
 
 ```
 2001:0db8:c9d2:aee5:73e3:934a:a5ae:9551
 ```
 
-That's not all! Lots of times, you'll have an IP address with lots of
-zeros in it, and you can compress them between two colons. And you can
-leave off leading zeros for each byte pair. For instance, each of these
-pairs of addresses are equivalent:
+¡Eso no es todo! Un montón de veces, vas a tener direcciones IP con
+montones de ceros en ella, y los podés comprimir entre dos dos puntos. Y
+podés ignorar los ceros al principio de cada par de bytes. Por ejemplo,
+cada uno de estos pares de direcciones son equivalentes:
 
 ```
 2001:0db8:c9d2:0012:0000:0000:0000:0051
@@ -775,23 +777,23 @@ pairs of addresses are equivalent:
 ::1
 ```
 
-The address `::1` is the _loopback address_. It always means "this
-machine I'm running on now". In IPv4, the loopback address is
-`127.0.0.1`.
+La dirección `::1` es la _dirección de loopback_. Siempre significa
+"esta máquina en la que estoy ejecutando ahora". En IPv4, la dirección
+de loopback es `127.0.0.1`.
 
-Finally, there's an IPv4-compatibility mode for IPv6 addresses that you
-might come across. If you want, for example, to represent the IPv4
-address `192.0.2.33` as an IPv6 address, you use the following notation:
+Finalmente, existe un modo de compatibilidad IPv4 para las direcciones
+IPv6 que puede que veas. Si querés, por ejemplo, representar la
+dirección IPv4 `192.0.2.33` como una dirección IPv6, usás esta notación:
 "`::ffff:192.0.2.33`".
 
-We're talking serious fun.
+Qué divertido todo.
 
-In fact, it's such serious fun, that the Creators of IPv6 have quite
-cavalierly lopped off trillions and trillions of addresses for reserved
-use, but we have so many, frankly, who's even counting anymore? There
-are plenty left over for every man, woman, child, puppy, and parking
-meter on every planet in the galaxy.  And believe me, every planet in
-the galaxy has parking meters. You know it's true.
+De hecho, es tan divertido que quienes crearon IPv6 han honrosamente
+descartado trillones y trillones de direcciones para uso reservado, pero
+habiendo tantas, en serio, ¿quién se gastaría en llevar la cuenta? Aún
+sobran suficientes para cada hombre, mujer, niñ@, cachorro y parquímetro
+en cada planeta de la galaxia. Y, creeme, cada planeta de la galaxia
+tiene parquímetros. Sabés que es cierto.
 
 
 ### Subnets
