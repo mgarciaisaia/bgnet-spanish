@@ -494,99 +494,104 @@ otros tipos dependiendo del sabor de Unix que estés ejecutando. Este
 documento sólo se encarga de los primeros: sockets de Internet.
 
 
-## Two Types of Internet Sockets
+## Dos tipos de sockets de Internet
 
-What's this? [ix[socket!types]] There are two types of Internet sockets?
-Yes. Well, no. I'm lying. There are more, but I didn't want to scare
-you.  I'm only going to talk about two types here. Except for this
-sentence, where I'm going to tell you that [ix[raw sockets]]
-[ix[socket!raw]] "Raw Sockets" are also very powerful and you should
-look them up.
+¿Cómo? [ix[socket!types]] ¿Hay dos tipos de sockets de Internet? Sí.
+Buen, no. Estoy mintiendo. Hay más, pero no quería asustarte. Sólo voy a
+hablar de dos tipos acá. Excepto por esta oración, donde te voy a decir
+que los [ix[raw sockets]] [ix[socket!raw]] "Raw Sockets" (_sockets en
+crudo_) también son muy poderosos y deberías leer sobre ellos.
 
-All right, already. What are the two types? One is [ix[socket!stream]]
-"Stream Sockets"; the other is [ix[socket!datagram]] "Datagram Sockets",
-which may hereafter be referred to as "`SOCK_STREAM`" and
-"`SOCK_DGRAM`", respectively. Datagram sockets are sometimes called
-"connectionless sockets".  (Though they can be [ixtt[connect()]]
-`connect()`'d if you really want. See [`connect()`](#connect), below.)
+OK, dale. ¿Cuáles son los dos tipos de sockets? Unos son los
+[ix[socket!stream]] "Sockets Stream"; los otros son los
+[ix[socket!datagram]] "Datagram Sockets", a los que me voy a referir
+como "`SOCK_STREAM`" y "`SOCK_DGRAM`" respectivamente. A los sockets
+datagram a veces se los llama "no-conectados" (aunque se les puede hacer
+[ixtt[connect()]] `connect()` si tuvieras muchas ganas; mirá
+[`connect()`](#connect) debajo).
 
-Stream sockets are reliable two-way connected communication streams. If
-you output two items into the socket in the order "1, 2", they will
-arrive in the order "1, 2" at the opposite end. They will also be
-error-free. I'm so certain, in fact, they will be error-free, that I'm
-just going to put my fingers in my ears and chant _la la la la_ if
-anyone tries to claim otherwise.
+Los sockets stream son flujos de comunicación bidireccional confiable y
+orientados a conexión. Si enviás dos elementos por un socket en el orden
+"1, 2", van a llegar en el orden "1, 2" del otro lado. También van a
+llegar sin errores. Estoy tan seguro, incluso, de que van a llegar
+libres de errores, que simplemente voy a taparme los oídos y gritar _la
+la la la_ si alguien trata de proponer lo contrario.
 
-What uses [ix[socket!stream]] stream sockets? Well, you may have heard
-of the [ix[telnet]] `telnet` application, yes? It uses stream sockets.
-All the characters you type need to arrive in the same order you type
-them, right? Also, web browsers use the Hypertext Transfer Protocol [ix[HTTP]]
-(HTTP) which uses stream sockets to get pages. Indeed, if you telnet
-to a web site on port 80, and type "`GET / HTTP/1.0`" and hit RETURN
-twice, it'll dump the HTML back at you!
+¿Qué usos tienen los [ix[socket!stream]] sockets stream? Bueno, habrás
+escuchado de la aplicación [ix[telnet]] `telnet`, ¿verdad? Bueno, usa
+sockets stream. Todos los caracteres que tipeás tienen que llegar en ese
+mismo orden, ¿no? También los navegadores web usan el Protocolo de
+Transferencia de Hipertexto [ix[HTTP]] (HTTP), que usa sockets stream
+para conseguir las páginas. De hecho, si hacés `telnet` a un sitio web
+en el puerto 80, tipeás "`GET / HTTP/1.0`" y le das ENTER dos veces, ¡te
+va a devolver el HTML de la página!
 
-> If you don't have `telnet` installed and don't want to install it, or
-> your `telnet` is being picky about connecting to clients, the guide
-> comes with a `telnet`-like program called [flx[`telnot`|telnot.c]].
-> This should work well for all the needs of the guide. (Note that
-> telnet is actually a [flrfc[spec'd networking protocol|854]], and
-> `telnot` doesn't implement this protocol at all.)
+> Si no tenés `telnet` instalado y no querés instalarlo, o tu `telnet`
+> está exquisito a la hora de conectarse, esta guía trae un programa
+> simil-`telnet` llamado [flx[`telnot`|telnot.c]]. Debería cubrir todos
+> los casos de la guía (notá que telnet es en realidad un
+> [flrfc[protocolo de red especificado|854]], y que `telnot` no
+> implementa este protocolo en absoluto).
 
-How do stream sockets achieve this high level of data transmission
-quality?  They use a protocol called "The Transmission Control
-Protocol", otherwise known as [ix[TCP]] "TCP" (see [flrfc[RFC 793|793]]
-for extremely detailed info on TCP). TCP makes sure your data arrives
-sequentially and error-free. You may have heard "TCP" before as the
-better half of "TCP/IP" where [ix[IP]]  "IP" stands for "Internet
-Protocol" (see [flrfc[RFC 791|791]]).  IP deals primarily with Internet
-routing and is not generally responsible for data integrity.
+¿Cómo logran los sockets stream este alto nivel de calidad de
+transmisión de datos? Usan un protocolo llamado el "Protocolo de Control
+de Transmisión", también conocido como [ix[TCP]] TCP (por sus siglas en
+inglés; mirá la [flrfc[RFC 793|793]] para información extremadamente
+detallada de TCP). TCP se asegura de que tu información llegue de manera
+secuencial y libre de errores. Puede que hayas escuchado "TCP" antes
+como la mitad de "TCP/IP", donde [ix[IP]] "IP" significa "Protocolo de
+Internet" (por sus siglas en inglés; mirá la [flrfc[RFC 791|791]]). IP
+se encarga principalmente del routeo en Internet, y no se encarga de la
+integridad de los datos.
 
-Cool. [ix[socket!datagram]] What about Datagram sockets? Why are they
-called connectionless? What is the deal, here, anyway? Why are they
-unreliable?  Well, here are some facts: if you send a datagram, it may
-arrive. It may arrive out of order. If it arrives, the data within the
-packet will be error-free.
+Piola. [ix[socket!datagram]] ¿Y qué hay de los sockets datagrama? ¿Por
+qué se los llama sockets "no conectados"? ¿De qué va todo esto? ¿Por qué
+no son confiables? Bueno, estos son algunos hechos: si enviás un
+datagrama, puede que llegue. Puede que llegue fuera de orden. Si llega,
+los datos dentro del paquete van a llegar libres de errores.
 
-Datagram sockets also use IP for routing, but they don't use TCP; they
-use the "User Datagram Protocol", or [ix[UDP]] "UDP" (see [flrfc[RFC
-768|768]]).
+Los sockets datagrama también usan IP para routear, pero no usan TCP;
+usan el "Protocolo de Datagramas de Usuario", o [ix[UDP]] "UDP" (por sus
+siglas en inglés; mirá la [flrfc[RFC 768|768]]).
 
-Why are they connectionless? Well, basically, it's because you don't
-have to maintain an open connection as you do with stream sockets. You
-just build a packet, slap an IP header on it with destination
-information, and send it out.  No connection needed. They are generally
-used either when a TCP stack is unavailable or when a few dropped
-packets here and there don't mean the end of the Universe. Sample
-applications: `tftp` (trivial file transfer protocol, a little brother
-to FTP), `dhcpcd` (a DHCP client), multiplayer games, streaming audio,
-video conferencing, etc.
+¿Por qué son "no conectados"? Bueno, básicamente, porque no tenés que
+mantener una conexión abierta como lo necesitás con los sockets stream.
+Simplemente armás un paquete, le agregás una cabecera IP con la
+información del destino, y lo mandás. No hace falta conectarse. Se los
+suele usar o bien cuando no hay un stack TCP disponible, o bien cuando
+perder algún que otro paquete no resulte en el fin del universo.
+Ejemplos de aplicaciones: `tftp` (protocolo de transferencia de archivos
+triviales, un hermaano menor de FTP), `dhcpcd` (un cliente DHCP), juegos
+multijugador, streaming de audio, videoconferencias, etc.
 
-"Wait a minute! `tftp` and `dhcpcd` are used to transfer binary
-applications from one host to another! Data can't be lost if you expect
-the application to work when it arrives! What kind of dark magic is
-this?"
+"¡Un momento! `tftp` y `dhcpcd` transfieren aplicaciones binarias de un
+host a otro! ¡No podés perder datos si esperás que la aplicación
+funcione cuando llega del otro lado! ¿Qué clase de magia oscura es
+esta?"
 
-Well, my human friend, `tftp` and similar programs have their own
-protocol on top of UDP. For example, the tftp protocol says that for
-each packet that gets sent, the recipient has to send back a packet that
-says, "I got it!" (an "ACK" packet). If the sender of the original
-packet gets no reply in, say, five seconds, he'll re-transmit the packet
-until he finally gets an ACK. This acknowledgment procedure is very
-important when implementing reliable `SOCK_DGRAM` applications.
+Bueno, mi querid@ human@, `tftp` y otros programas similares tienen su
+propio protocolo por sobre UDP. Por ejemplo, el protocolo tftp dice que
+por cada paquete que se envía, el receptor tiene que enviar otro paquete
+de vuelta que diga "OK, ¡lo recibí!" (un paquete "ACK"). Si el emisor
+del paquete original no recibe una respuesta en, ponele, cinco segundos,
+volverá a transmitir el paquete hasta que finalmente consiga un ACK.
+Este procedimiento de reconocimiento es muy importante a la hora de
+implementar aplicaciones `SOCK_DGRAM` confiables.
 
-For unreliable applications like games, audio, or video, you just ignore
-the dropped packets, or perhaps try to cleverly compensate for them.
-(Quake players will know the manifestation this effect by the technical
-term: _accursed lag_.  The word "accursed", in this case, represents any
-extremely profane utterance.)
+Para aplicaciones que no necesitan esa garantía de confianza como
+juegos, audo o video, simplemente podés ignorar los paquetes perdidos, o
+quizá ingeniártelas para compensar su ausencia. (Si jugaste Quake, quizá
+conozcas la manifestación de este efecto con el término _lag maldito_ -
+"accursed lag". En este contexto, el término "maldito" / "accursed"
+representa cualquier insulto extremo.)
 
-Why would you use an unreliable underlying protocol? Two reasons: speed
-and speed. It's way faster to fire-and-forget than it is to keep track
-of what has arrived safely and make sure it's in order and all that. If
-you're sending chat messages, TCP is great; if you're sending 40
-positional updates per second of the players in the world, maybe it
-doesn't matter so much if one or two get dropped, and UDP is a good
-choice.
+¿Por qué usarías un protocolo no confiable? Dos razones: velocidad, y
+velocidad. Es mucho más rápido mandar-y-olvidarse que llevar registro de
+qué cosas llegaron bien y asegurarse que están en orden y todo eso. Si
+estás mandando mensajes de chat, TCP es genial; si estás mandando 40
+actualizaciones de posición por segundo de los jugadores en el mundo,
+quizá no importe tanto si una o dos de ellas se pierden, y entonces UDP
+es una buena elección.
 
 
 ## Low level Nonsense and Network Theory {#lowlevel}
