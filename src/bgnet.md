@@ -594,80 +594,86 @@ quizá no importe tanto si una o dos de ellas se pierden, y entonces UDP
 es una buena elección.
 
 
-## Low level Nonsense and Network Theory {#lowlevel}
+## Sinsentidos de bajo nivel y teoría de red {#lowlevel}
 
-Since I just mentioned layering of protocols, it's time to talk about
-how networks really work, and to show some examples of how
-[ixtt[SOCK\_DGRAM]] `SOCK_DGRAM` packets are built.  Practically, you
-can probably skip this section. It's good background, however.
+Dado que acabo de mencionar el apilamiento de protocolos en capas, es
+tiempo de hablar sobre cómo funcionan realmente las redes, y mostrar
+algunos ejemplos sobre cómo se construyen los paquetes
+[ixtt[SOCK\_DGRAM]] `SOCK_DGRAM`. En la práctica, podés saltearte esta
+sección, pero provee un buen trasfondo de todos modos.
 
-![Data Encapsulation.](dataencap.pdf "[Encapsulated Protocols Diagram]")
+![Encapsulamiento de datos](dataencap.pdf "[Diagrama de protocolos encapsulados]")
 
-Hey, kids, it's time to learn about [ix[data encapsulation]] _Data
-Encapsulation_! This is very very important. It's so important that you
-might just learn about it if you take the networks course here at Chico
-State `;-)`.  Basically, it says this: a packet is born, the packet is
-wrapped ("encapsulated") in a [ix[header]] header (and rarely a
-[ix[footer]] footer) by the first protocol (say, the [ix[TFTP]] TFTP
-protocol), then the whole thing (TFTP header included) is encapsulated
-again by the next protocol (say, [ix[UDP]] UDP), then again by the next
-[ix[IP]] (IP), then again by the final protocol on the hardware
-(physical) layer (say, [ix[Ethernet]] Ethernet).
+¡Bueno, chiquis, es hora de aprender sobre [ix[data encapsulation]]
+_Encapsulamiento de datos_! Esto es muy, muy importante. Es tan
+importante que puede que sólo te enteres que existe si hacés el curso de
+redes acá en la Chico State `;-)`. Básicamente, dice esto: un paquete
+nace, se lo envuelve ("encapsula") en un [ix[header]] encabezado /
+"header" (y, rara vez, un "pie de página" / "footer") por un primer
+protocolo (digamos, el [ix[TFTP]] protocolo TFTP), y luego a todo eso
+(incluyendo el encabezado TFTP) vuelve a encapsularse por el protocolo
+siguiente (digamos, [ix[UDP]] UDP), y luego otra vez por el siguiente
+[ix[IP]] (IP), y finalmente una vez más por el protocolo final en la
+capa (física) del hardware (digamos, [ix[Ethernet]] Ethernet).
 
-When another computer receives the packet, the hardware strips the
-Ethernet header, the kernel strips the IP and UDP headers, the TFTP
-program strips the TFTP header, and it finally has the data.
+Cuando otra computadora recibe el paquete, el hardware le saca el
+encabezado Ethernet, el kernel le saca los encabezados IP y UDP, el
+programa TFTP le saca el encabezado TFTP, y ahí finalmente consigue los
+datos.
 
-Now I can finally talk about the infamous [ix[layered network model]]
-_Layered Network Model_ (aka "ISO/OSI"). This Network Model describes a
-system of network functionality that has many advantages over other
-models. For instance, you can write sockets programs that are exactly
-the same without caring how the data is physically transmitted (serial,
-thin Ethernet, AUI, whatever) because programs on lower levels deal with
-it for you. The actual network hardware and topology is transparent to
-the socket programmer.
+Ahora sí, finalmente puedo hablar sobre el infame [ix[layered network
+model]] _Modelo de red en capas_ (también conocido como "ISO/OSI"). Este
+Modelo de Red describe un sistema de funcionalidad de red que tiene
+varias ventajas sobre los demás modelos. Por ejemplo, podés escribir
+programas con sockets que son exactamente los mismos sin importar cómo
+se transmiten los datos físicamente (puerto serie, thin Ethernet, AUI, o
+lo que sea) porque hay programas en niveles más bajos que lidian con eso
+por vos. La topología y hardware de red reales son transparentes a quien
+programa los sockets.
 
-Without any further ado, I'll present the layers of the full-blown
-model.  Remember this for network class exams:
+Sin más preámbulos, voy a presentar todas las capas del modelo.
+Recordalas para tus exámenes de redes:
 
-* Application
-* Presentation
-* Session
-* Transport
-* Network
-* Data Link
-* Physical
+* Aplicación
+* Presentación
+* Sesión
+* Transporte
+* Red
+* Enlace de datos
+* Físico
 
-The Physical Layer is the hardware (serial, Ethernet, etc.). The
-Application Layer is just about as far from the physical layer as you
-can imagine---it's the place where users interact with the network.
+La capa física es el hardware (serie, Ethernet, etc.). La capa de
+aplicación es lo más lejano a la capa física que puedas imaginar - es
+donde l@s usuari@s interactúan con la red.
 
-Now, this model is so general you could probably use it as an automobile
-repair guide if you really wanted to. A layered model more consistent
-with Unix might be:
+Ahora, este modelo es tan general que probablemente puedas usarlo como
+una guía de reparación de automóviles si lo intentaras lo suficiente. Un
+modelo de capas más consistente con Unix podría ser:
 
-* Application Layer (_telnet, ftp, etc._)
-* Host-to-Host Transport Layer (_TCP, UDP_)
-* Internet Layer (_IP and routing_)
-* Network Access Layer (_Ethernet, wi-fi, or whatever_)
+* Capa de aplicación (_telnet, ftp, etc._)
+* Capa de transporte Host-a-Host (_TCP, UDP_)
+* Capa de Internet (_IP y routeo_)
+* Capa de acceso a red (_Ethernet, wi-fi, o lo que sea_)
 
-At this point in time, you can probably see how these layers correspond
-to the encapsulation of the original data.
+A esta altura, puede que ya veas cómo estas capas corresponden al
+encapsulamiento de los datos originales.
 
-See how much work there is in building a simple packet? Jeez! And you
-have to type in the packet headers yourself using "`cat`"! Just kidding.
-All you have to do for stream sockets is [ixtt[send()]] `send()` the
-data out. All you have to do for datagram sockets is encapsulate the
-packet in the method of your choosing and [ixtt[sendto()]] `sendto()` it
-out. The kernel builds the Transport Layer and Internet Layer on for you
-and the hardware does the Network Access Layer. Ah, modern technology.
+¿Ves todo lo que hay que hacer para construir un simple paquete? ¡Uff!
+¡Y tenés que tipear los encabezados de los paquetes a mano usando
+"`cat"`! Nah, mentira. Todo lo que tenés que hacer con los sockets
+stream es [ixtt[send()]] `send()` para enviar los datos. Todo lo que
+tenés que hacer para los sockets datagrama es encapsular el paquete de
+la forma que quieras, y hacerle [ixtt[sendto()]] `sendto()` para
+enviarlo. El kernel construye las capas de transporte e internet por
+vos, y el hardware se encarga de la capa de acceso a red. Ah, ¡la
+tecnología moderna!
 
-So ends our brief foray into network theory. Oh yes, I forgot to tell
-you everything I wanted to say about routing: nothing! That's right, I'm
-not going to talk about it at all. The router strips the packet to the
-IP header, consults its routing table, [ix[blah blah blah]] _blah blah
-blah_. Check out the [flrfc[IP RFC|791]] if you really really care. If
-you never learn about it, well, you'll live.
+Así termina nuestra breve incursión en la teoría de redes. Ah, sí, me
+olvidé de decirte todo lo que quería decirte sobre routeo: ¡nada! Así
+es, no voy a hablar de ello en absoluto. El router saca el encabezado IP
+del paquete, consulta su tabla de routeo, [ix[blah blah blah]] _blah
+blah blah_. Revisá la [flrfc[IP RFC|791]] si realmente te interesa. Si
+nunca aprendés sobre ello, meh, vas a sobrevivir igual.
 
 
 # IP Addresses, `struct`s, and Data Munging
