@@ -796,54 +796,53 @@ en cada planeta de la galaxia. Y, creeme, cada planeta de la galaxia
 tiene parquímetros. Sabés que es cierto.
 
 
-### Subnets
+### Subredes
 
-For organizational reasons, it's sometimes convenient to declare that
-"this first part of this IP address up through this bit is the _network
-portion_ of the IP address, and the remainder is the _host portion_.
+Para organizarse mejor, a veces conviene declarar que "esta primer parte
+de esta dirección IP hasta este bit es la _porción de la red_ de la
+dirección IP, y que el resto es la _porción del host_".
 
-For instance, with IPv4, you might have `192.0.2.12`, and we could say
-that the first three bytes are the network and the last byte was the
-host. Or, put another way, we're talking about host `12` on network
-`192.0.2.0` (see how we zero out the byte that was the host).
+Por ejemplo, con IPv4, podés tener `192.0.2.12`, y podríamos decir que
+los primeros 3 bytes son la red y el último byte son el host. O, dicho
+de otra forma, estamos hablando del host `12` en la red `192.0.2.0`
+(fijate cómo anulamos el bye que era del host).
 
-And now for more outdated information! Ready? In the Ancient Times,
-there were "classes" of subnets, where the first one, two, or three
-bytes of the address was the network part. If you were lucky enough to
-have one byte for the network and three for the host, you could have 24
-bits-worth of hosts on your network (16 million or so). That was a
-"Class A" network. On the opposite end was a "Class C", with three bytes
-of network, and one byte of host (256 hosts, minus a couple that were
-reserved).
+Y ahora, ¡sigamos con más información desactualizada! ¿List@? En los
+Tiempos Antigüos, había tres "clases" de subredes, donde uno, dos o los
+tres primeros bytes de la dirección eran la parte de la red. Si tenías
+la suerte de tener un byte para la red y tres para el host, podías tener
+24 bits de hosts en tu red (unos 16 millones). Eso era una red "clase
+A". El extremo opuesto era la "clase C", con tres bytes para la red, y
+uno para el host (256 hosts, menos algunas direcciones reservadas).
 
-So as you can see, there were just a few Class As, a huge pile of Class
-Cs, and some Class Bs in the middle.
+Así que, como verás, había sólo algunas pocas redes clase A, montones de
+clase C, y alguna cantidad en el medio de clase B.
 
-The network portion of the IP address is described by something called
-the _netmask_, which you bitwise-AND with the IP address to get the
-network number out of it. The netmask usually looks something like
-`255.255.255.0`. (E.g.  with that netmask, if your IP is `192.0.2.12`,
-then your network is `192.0.2.12` AND `255.255.255.0` which gives
-`192.0.2.0`.)
+La porción de red de la dirección IP se describe usando una cosa llamada
+_máscara de red_, a la que le hacés un AND bit a bit con la dirección IP
+para conseguir su número de red. La máscara de red suele tener una pinta
+como `255.255.255.0` (por ejemplo, con esa máscara, si tu IP es
+`192.0.2.12`, entonces tu red es `192.0.2.12` AND `255.255.255.0`, que
+da `192.0.2.0`).
 
-Unfortunately, it turned out that this wasn't fine-grained enough for
-the eventual needs of the Internet; we were running out of Class C
-networks quite quickly, and we were most definitely out of Class As, so
-don't even bother to ask. To remedy this, The Powers That Be allowed for
-the netmask to be an arbitrary number of bits, not just 8, 16, or 24. So
-you might have a netmask of, say `255.255.255.252`, which is 30 bits of
-network, and 2 bits of host allowing for four hosts on the network.
-(Note that the netmask is _ALWAYS_ a bunch of 1-bits followed by a bunch
-of 0-bits.)
+Lamentablemente, resultó que esto no daba todo el control y precisión
+necesario para las eventuales necesidades de la Internet; nos estábamos
+quedando sin redes Clase C bastante rápido, y ya nos habíamos quedado
+sin Clases A hacía rato, así que ni preguntes. Para remediarlo, Los
+Poderes permitieron que la máscara de red sea de cualquier cantidad
+arbitraria de bits, no sólo 8, 16 o 24. Entonces podés tener una máscara
+de, digamos, `255.255.255.252`, que seríaan 30 bits de red y 2 bits de
+host, permitiendo 4 hosts en la red (notá que la máscara de red
+_SIEMPRE_ es un montón de bits 1 seguido por otro montón de bits 0).
 
-But it's a bit unwieldy to use a big string of numbers like
-`255.192.0.0` as a netmask. First of all, people don't have an intuitive
-idea of how many bits that is, and secondly, it's really not compact. So
-the New Style came along, and it's much nicer. You just put a slash
-after the IP address, and then follow that by the number of network bits
-in decimal. Like this: `192.0.2.12/30`.
+Pero es un plomazo usar un choclo de números como `255.192.0.0` como
+máscara de red. Primero que nada, la gente no tiene una idea intuitiva
+de cuántos bits representa eso, y, segundo, no es muy compacto. Así que
+ahí apareció el Nuevo Estilo, y es mucho más feliz. Simplemente ponés
+una barra al final de la dirección IP, seguida del número de bits, en
+decimal, que componen la parte de red. Así: `192.0.2.12/30`.
 
-Or, for IPv6, something like this: `2001:db8::/32` or
+O, para IPv6, algo como esto: `2001:db8::/32` o
 `2001:db8:5413:4028::9db9/64`.
 
 
