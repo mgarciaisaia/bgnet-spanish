@@ -846,36 +846,37 @@ O, para IPv6, algo como esto: `2001:db8::/32` o
 `2001:db8:5413:4028::9db9/64`.
 
 
-### Port Numbers
+### Números de puerto
 
-If you'll kindly remember, I presented you earlier with the [Layered
-Network Model](#lowlevel) which had the Internet Layer (IP) split off
-from the Host-to-Host Transport Layer (TCP and UDP). Get up to speed on
-that before the next paragraph.
+Si hacés memoria, antes te presenté el [Modelo de Red en
+Capas](#lowlevel), que tiene a la capa Internet (IP) separada de la Capa
+de Transporte Host-a-Host (TCP y UDP). Refrescá eso antes de pasar al
+próximo párrafo.
 
-Turns out that besides an IP address (used by the IP layer), there is
-another address that is used by TCP (stream sockets) and,
-coincidentally, by UDP (datagram sockets). It is the _port number_. It's
-a 16-bit number that's like the local address for the connection.
+Resulta que además de una dirección IP (usada por la capa IP), hay otra
+dirección que necesita TCP (sockets stream) y, coincidentemente, UDP
+(sockets datagrama). Es el _número de puerto_. Es un número de 16 bits
+que es como la dirección local para la conexión.
 
-Think of the IP address as the street address of a hotel, and the port
-number as the room number. That's a decent analogy; maybe later I'll
-come up with one involving the automobile industry.
+Pensá en la dirección IP como la dirección postal de un hotel, y el
+número de puerto como el número de habitación. Es una analogía decente;
+quizá en algún momento se me ocurra alguna con la industria automotriz.
 
-Say you want to have a computer that handles incoming mail AND web
-services---how do you differentiate between the two on a computer with a
-single IP address?
+Digmaos que querés tener una computadora que maneje emails entrantes Y
+servicios web - ¿cómo distinguís a ambos en una computadora con una
+única dirección IP?
 
-Well, different services on the Internet have different well-known port
-numbers.  You can see them all in [fl[the Big IANA Port
-List|https://www.iana.org/assignments/port-numbers]] or, if you're on a
-Unix box, in your `/etc/services` file. HTTP (the web) is port 80,
-telnet is port 23, SMTP is port 25, the game
-[fl[DOOM|https://en.wikipedia.org/wiki/Doom_(1993_video_game)]] used
-port 666, etc. and so on. Ports under 1024 are often considered special,
-and usually require special OS privileges to use.
+Bueno, los distintos servicios en la Internet tienen distintos números
+"conocidos" de puertos. Podés verlos en [fl[la gran Lista de Puertos de
+IANA|https://www.iana.org/assignments/port-numbers]] o, si estás en una
+máquina Unix, en tu archivo `/etc/servicies`. HTTP (la web) es el puerto
+80, telnet es el puerto 23, SMTP es el puerto 25, el juego
+[fl[DOOM|https://en.wikipedia.org/wiki/Doom_(1993_video_game)]] usaba el
+puerto 666, etc. Los puertos debajo del 1024 suelen ser considerados
+especiales y suelen requerir privilegios especiales en el sistema
+operativo para usarlos.
 
-And that's about it!
+¡Y eso es todo!
 
 
 ## Byte Order
