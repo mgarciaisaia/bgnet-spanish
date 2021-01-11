@@ -879,83 +879,85 @@ operativo para usarlos.
 ¡Y eso es todo!
 
 
-## Byte Order
+## Orden de los bytes
 
-[ix[byte ordering]] By Order of the Realm! There shall be two byte
-orderings, hereafter to be known as Lame and Magnificent!
+[ix[byte ordering]] ¡Por Orden del Reino! ¡Han de haber dos órdenes de
+bytes posibles, de aquí en más conocidos como el Flojo y el Magnífico!
 
-I joke, but one really is better than the other. `:-)`
+Ah re, pero igual sí - uno realmente es mejor que el otro. `:-)`
 
-There really is no easy way to say this, so I'll just blurt it out: your
-computer might have been storing bytes in reverse order behind your
-back. I know! No one wanted to have to tell you.
+Realmente no existe manera sencilla de decir esto, así que te lo voy a
+vomitar de una: puede que tu computadora te haya estado almacenando los
+bytes en orden inverso a escondidas. ¡Lo sé! Nadie quería ser quien te
+lo tuviera que decir.
 
-The thing is, everyone in the Internet world has generally agreed that
-if you want to represent the two-byte hex number, say `b34f`, you'll
-store it in two sequential bytes `b3` followed by `4f`. Makes sense,
-and, as [fl[Wilford
-Brimley|https://en.wikipedia.org/wiki/Wilford_Brimley]] would tell you,
-it's the Right Thing To Do. This number, stored with the big end first,
-is called _Big-Endian_.
+La cosa es que tod@s en la Internet más o menos nos pusimos de acuerdo
+en que para representar el número hexadecimal de dos bytes (ponele)
+`b34f`, lo almacenás en dos bytes consecutivos: `b3`, seguido del `4f`.
+Tiene sentido, y, como diría [fl[Wilford
+Brimley|https://en.wikipedia.org/wiki/Wilford_Brimley]], Es Lo Correcto.
+Este número, almacenado con su extremo mayor primero, se llama
+_Big-Endian_.
 
-Unfortunately, a _few_ computers scattered here and there throughout the
-world, namely anything with an Intel or Intel-compatible processor,
-store the bytes reversed, so `b34f` would be stored in memory as the
-sequential bytes `4f` followed by `b3`. This storage method is called
-_Little-Endian_.
+Lamentablemente, _algunas_ de las computadoras que hay por ahí en el
+mundo (por nombrar, cualquiera con un procesador Intel o compatible)
+almacena los bytes invertidos, por lo que `b34f` se guarda en memoria
+como el byte `4f` seguido del byte `b3`. Este método de almacenamiento
+se llama _Little-Endian_.
 
-But wait, I'm not done with terminology yet! The more-sane _Big-Endian_
-is also called _Network Byte Order_ because that's the order us network
-types like.
+Pero esperá, ¡aún no terminé con la terminología! El más sensato
+_Big-Endian_ también se llama _Orden (de bytes) de Red_, porque ese es
+el orden que nos gusta a quienes nos gustan las redes.
 
-Your computer stores numbers in _Host Byte Order_. If it's an Intel
-80x86, Host Byte Order is Little-Endian. If it's a Motorola 68k, Host
-Byte Order is Big-Endian. If it's a PowerPC, Host Byte Order is... well,
-it depends!
+Tu computadora almacena los números en _Orden de Host_. Si es un Intel
+80x86, el Orden de Host es Little-Endian. Si es un Motorola 68k, el
+Orden de Host es Big-Endian. Si es un PowerPC, el Orden de Host es...
+Bueno, ¡depende!
 
-A lot of times when you're building packets or filling out data
-structures you'll need to make sure your two- and four-byte numbers are
-in Network Byte Order. But how can you do this if you don't know the
-native Host Byte Order?
+Muchas veces, al construir paquetes o completar estructuras de datos, te
+vas a tener que encargar de que tus números de dos o cuatro bytes estén
+en el Orden de Red. Pero ¿cómo podés hacer esto si no sabés cuál es tu
+Orden de Host nativo?
 
-Good news! You just get to assume the Host Byte Order isn't right, and
-you always run the value through a function to set it to Network Byte
-Order. The function will do the magic conversion if it has to, and this
-way your code is portable to machines of differing endianness.
+¡Buenas noticias! Simplemente asumís que tu Orden de Host no es
+correcto, y siempre pasás los valores por una función que los convierte
+a Orden de Red. La función va a hacer la conversión mágica si necesita
+hacerla, y de esta manera tu código puede ser portado a máquinas con
+distinto endianness.
 
-All righty. There are two types of numbers that you can convert: `short`
-(two bytes) and `long` (four bytes). These functions work for the
-`unsigned` variations as well. Say you want to convert a `short` from
-Host Byte Order to Network Byte Order. Start with "h" for "host", follow
-it with "to", then "n" for "network", and "s" for "short": h-to-n-s, or
-`htons()` (read: "Host to Network Short").
+Joya. Hay dos tipos de números que podés convertir: `short` (dos bytes)
+y `long` (cuatro bytes). Estas funciones también sirven con las
+variaciones `unsigned`. Digamos que querés convertir un `short` de Orden
+de Host a Orden de Red. Empezá con una "h" de "host", seguí con "to"
+(_a_, en inglés), luego una "n" de "network" ("red"), y una "s" de
+"short": h-to-n-s, o `htons()` (se lee "Host to Network Short", o "Host
+a short de red").
 
-It's almost too easy...
+Es casi que muy sencillo (en inglés, al menos)...
 
-You can use every combination of "n", "h", "s", and "l" you want, not
-counting the really stupid ones. For example, there is NOT a `stolh()`
-("Short to Long Host") function---not at this party, anyway. But there
-are:
+Podés usar cualquier combinación de "n", "h", "s" y "l" que quieras,
+excepto las realmente estúpidas. Por ejemplo, NO HAY función `stolh()`
+("Short a Long de Host") - al menos no para esto. Pero existen:
 
 [ixtt[htons()]] [ixtt[htonl()]] [ixtt[ntohs()]] [ixtt[ntohl()]]
 
-| Function  | Description                   |
-|-----------|-------------------------------|
-| `htons()` | `h`ost `to` `n`etwork `s`hort |
-| `htonl()` | `h`ost `to` `n`etwork `l`ong  |
-| `ntohs()` | `n`etwork `to` `h`ost `s`hort |
-| `ntohl()` | `n`etwork `to` `h`ost `l`ong  |
+| Función   | Descripción                         |
+|-----------|-------------------------------------|
+| `htons()` | `h`ost `to` `n`etwork (red) `s`hort |
+| `htonl()` | `h`ost `to` `n`etwork (red) `l`ong  |
+| `ntohs()` | `n`etwork (red) `to` `h`ost `s`hort |
+| `ntohl()` | `n`etwork (red) `to` `h`ost `l`ong  |
 
-Basically, you'll want to convert the numbers to Network Byte Order
-before they go out on the wire, and convert them to Host Byte Order as
-they come in off the wire.
+Básicamente, vas a querer convertir los números al Orden de Red antes de
+enviarlos por el cable, y convertirlos a Orden de Host a medida que los
+recibís de la red.
 
-I don't know of a 64-bit variant, sorry. And if you want to do floating
-point, check out the section on [Serialization](#serialization), far
-below.
+No conozco variante de 64 bits, perdón. Y, si quisieras trabajar con
+punto flotante, mirá la sección de [Serialización](#serialization),
+bastante más abajo.
 
-Assume the numbers in this document are in Host Byte Order unless I say
-otherwise.
+Asumí que los números en este documento están en el Orden de Host a
+menos que aclare lo contrario.
 
 
 ## `struct`s {#structs}
