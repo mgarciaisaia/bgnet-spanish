@@ -960,186 +960,193 @@ Asumí que los números en este documento están en el Orden de Host a
 menos que aclare lo contrario.
 
 
-## `struct`s {#structs}
+## Estructuras (`struct`s) {#structs}
 
-Well, we're finally here. It's time to talk about programming. In this
-section, I'll cover various data types used by the sockets interface,
-since some of them are a real bear to figure out.
+Bueno, finalmente llegamos. Es hora de hablar de programación. En esta
+sección voy a cubrir varios tipos de datos que usa la interfaz de
+sockets, dado que algunos de ellos son realmente complejos de entender.
 
-First the easy one: a [ix[socket descriptor]] socket descriptor. A
-socket descriptor is the following type:
+Primero, el sencillito: un [ix[socket descriptor]] descriptor de socket.
+Un descriptor de socket tiene el siguiente tipo:
 
 ```{.c}
 int
 ```
 
-Just a regular `int`.
+Un `int` común.
 
-Things get weird from here, so just read through and bear with me.
+A partir de acá, las cosas se ponen raras, así que seguí leyendo y
+seguime el hilo.
 
-My First Struct™---`struct addrinfo`. [ixtt[struct addrinfo]] This
-structure is a more recent invention, and is used to prep the socket
-address structures for subsequent use. It's also used in host name
-lookups, and service name lookups. That'll make more sense later when we
-get to actual usage, but just know for now that it's one of the first
-things you'll call when making a connection.
+Mi Primer Struct™ - `struct addrinfo`. [ixtt[struct addrinfo]] Esta
+estructura es una invención más reciente, y se usa para preparar las
+estructuras de direcciones de sockets para su uso subsiguiente. También
+se la usa para hacer búsquedas de nombres de hosts ("host name lookups")
+y búsquedas de nombres de servicio ("service name lookups"). Todo eso va
+a cobrar más sentido más adelante cuando lleguemos a su uso real; por
+ahora sabé que es una de las primeras cosas que vas a usar cuando crees
+una conexión.
 
 ```{.c}
 struct addrinfo {
     int              ai_flags;     // AI_PASSIVE, AI_CANONNAME, etc.
     int              ai_family;    // AF_INET, AF_INET6, AF_UNSPEC
     int              ai_socktype;  // SOCK_STREAM, SOCK_DGRAM
-    int              ai_protocol;  // use 0 for "any"
-    size_t           ai_addrlen;   // size of ai_addr in bytes
-    struct sockaddr *ai_addr;      // struct sockaddr_in or _in6
-    char            *ai_canonname; // full canonical hostname
+    int              ai_protocol;  // usá 0 para "cualquiera"
+    size_t           ai_addrlen;   // tamaño de ai_addr en bytes
+    struct sockaddr *ai_addr;      // struct sockaddr_in o _in6
+    char            *ai_canonname; // hostname canónico completo
 
-    struct addrinfo *ai_next;      // linked list, next node
+    struct addrinfo *ai_next;      // lista enlazada, próximo nodo
 };
 ```
 
-You'll load this struct up a bit, and then call [ixtt[getaddrinfo()]]
-`getaddrinfo()`. It'll return a pointer to a new linked list of these
-structures filled out with all the goodies you need.
+Vas a configurar un poco esta estructura, y después llamar a 
+[ixtt[getaddrinfo()]] `getaddrinfo()`. La función te va a devolver un
+puntero a una nueva lista enlazada de esas estructuras, llenas con todos
+los datos que necesites.
 
-You can force it to use IPv4 or IPv6 in the `ai_family` field, or leave
-it as `AF_UNSPEC` to use whatever. This is cool because your code can be
-IP version-agnostic.
+Podés forzar el uso de IPv4 o IPv6 con el campo `ai_family`, o dejarlo
+como `AF_UNSPEC` para usar cualquiera de ambos. Esto está bueno porque
+te permite escribir código agnóstico de la versión de IP.
 
-Note that this is a linked list: `ai_next` points at the next
-element---there could be several results for you to choose from. I'd use
-the first result that worked, but you might have different business
-needs; I don't know everything, man!
+Notá que esta es una lista enlazada: `ai_next` apunta al próximo
+elemento - podría haber varios resultados de los que tengas que elegir.
+Yo usaría el primero que haya funcionado, pero puede que tengas tu
+dominio necesite algo distinto; ¡no puedo saber todo, che!
 
-You'll see that the `ai_addr` field in the `struct addrinfo` is a
-pointer to a [ixtt[struct sockaddr]] `struct sockaddr`. This is where we
-start getting into the nitty-gritty details of what's inside an IP
-address structure.
+Notarás que el campo `ai_addr` en el `struct addrinfo` es un puntero a
+un [ixtt[struct sockaddr]] `struct sockaddr`. Acá es donde empezamos a
+meternos en los detallitos meticulosos de qué hay dentro de una
+estructura de dirección IP.
 
-You might not usually need to write to these structures; oftentimes, a
-call to `getaddrinfo()` to fill out your `struct addrinfo` for you is
-all you'll need.  You _will_, however, have to peer inside these
-`struct`s to get the values out, so I'm presenting them here.
+Usualmente no vas a necesitar escribir vos estas estructuras; en general
+te va a alcanzar con llamar a `getaddrinfo()` para que te complete toda
+tu `struct addrinfo`. Lo que _sí_ vas a hacer es revisar estas `struct`s
+para sacarles los valores, y por eso te las presento acá.
 
-(Also, all the code written before `struct addrinfo` was invented we
-packed all this stuff by hand, so you'll see a lot of IPv4 code out in
-the wild that does exactly that. You know, in old versions of this guide
-and so on.)
+(Además, en los programas escritos antes de que inventaran el `struct
+addrinfo` escribíamos estos valores a mano, así que vas a ver montones
+de código IPv4 ahí afuera que lo hagan así. Ya sabés, versiones viejas
+de esta guía y demás.)
 
-Some `struct`s are IPv4, some are IPv6, and some are both. I'll make
-notes of which are what.
+Algunas `struct`s son para IPv4, otras son para IPv6, y algunas son para
+ambas. Iré mencionando cuáles con qué.
 
-Anyway, the `struct sockaddr` holds socket address information for many
-types of sockets.
+Como sea, el `struct sockaddr` guarda información de direcciones para
+varios tipos de sockets.
 
 ```{.c}
 struct sockaddr {
-    unsigned short    sa_family;    // address family, AF_xxx
-    char              sa_data[14];  // 14 bytes of protocol address
+    unsigned short    sa_family;    // familia de direcciones, AF_xxx
+    char              sa_data[14];  // 14 bytes de dirección de protocolo
 }; 
 ```
 
-`sa_family` can be a variety of things, but it'll be [ixtt[AF\_INET]]
-`AF_INET` (IPv4) or [ixtt[AF\_INET6]] `AF_INET6` (IPv6) for everything
-we do in this document. `sa_data` contains a destination address and
-port number for the socket. This is rather unwieldy since you don't want
-to tediously pack the address in the `sa_data` by hand.
+`sa_family` soporta varios valores distintos, pero siempre va a ser
+[ixtt[AF\_INET]] `AF_INET` (IPv4) o [ixtt[AF\_INET6]] `AF_INET6` (IPv6)
+para todo lo que hagamos en este documento. `sa_data` contiene una
+dirección de destino y un número de puerto para el socket. Esto es
+bastante un plomo, porque no querés andar metiendo la dirección y puerto
+en el `sa_data` a mano.
 
-To deal with `struct sockaddr`, programmers created a parallel
-structure: [ixtt[struct sockaddr]] `struct sockaddr_in` ("in" for
-"Internet") to be used with IPv4.
+Para lidiar mejor con `struct sockaddr`, l@s programadores crearon una
+estructura paralela para usar con IPv4: [ixtt[struct sockaddr]] `struct
+sockaddr_in` ("in" por "Internet").
 
-And _this is the important_ bit: a pointer to a `struct sockaddr_in` can
-be cast to a pointer to a `struct sockaddr` and vice-versa. So even
-though `connect()` wants a `struct sockaddr*`, you can still use a
-`struct sockaddr_in` and cast it at the last minute!
+Y _esta es la parte importante_: un puntero a una `struct sockaddr_in`
+puede castearse a un puntero a `struct sockaddr`, y vice-versa.
+Entonces, por más que `connect()` espera un `struct sockaddr*`, igual
+podés usar un `struct sockaddr_in` ¡y castearlo a último momento!
 
 ```{.c}
-// (IPv4 only--see struct sockaddr_in6 for IPv6)
+// (Sólo IPv4 - mirá struct sockaddr_in6 para IPv6)
 
 struct sockaddr_in {
-    short int          sin_family;  // Address family, AF_INET
-    unsigned short int sin_port;    // Port number
-    struct in_addr     sin_addr;    // Internet address
-    unsigned char      sin_zero[8]; // Same size as struct sockaddr
+    short int          sin_family;  // Familia de direcciones, AF_INET
+    unsigned short int sin_port;    // Número de puerto
+    struct in_addr     sin_addr;    // Dirección de Internet
+    unsigned char      sin_zero[8]; // Mismo tamaño que struct sockaddr
 };
 ```
 
-This structure makes it easy to reference elements of the socket
-address. Note that `sin_zero` (which is included to pad the structure to
-the length of a `struct sockaddr`) should be set to all zeros with the
-function `memset()`.  Also, notice that `sin_family` corresponds to
-`sa_family` in a `struct sockaddr` and should be set to "`AF_INET`".
-Finally, the `sin_port` must be in [ix[byte ordering]] _Network Byte
-Order_ (by using [ixtt[htons()]] `htons()`!)
+Esta estructura te facilita referenciar elementos de la dirección de
+socket. Notá que `sin_zero` (al que se incluye para que la estructura
+mida lo mismo que un `struct sockaddr` debería ponerse todo en cero con
+la función `memset()`. Además, fijate que `sin_family` corresponde al
+`sin_family` de la `struct sockaddr`, y tiene que valer "`AF_INET`".
+Finalmente, el `sin_port` tiene que estar en [ix[byte ordering]] _Orden
+de bytes de Red_ (¡usando [ixtt[htons()]] `htons()`!).
 
-Let's dig deeper! You see the `sin_addr` field is a `struct in_addr`.
-What is that thing? Well, not to be overly dramatic, but it's one of the
-scariest unions of all time:
+¡Sigamos ahondando! Verás que el campo `sin_addr` es un `struct
+in_addr`. ¿Qué es esa cosa? Bueno, no quiero hacer mucho drama, pero es
+una de las uniones (_unions_) más aterradoras de la historia:
 
 ```{.c}
-// (IPv4 only--see struct in6_addr for IPv6)
+// (Sólo IPv4 - mirá struct in6_addr para IPv6)
 
-// Internet address (a structure for historical reasons)
+// Dirección de Internet (una estructura por motivos históricos)
 struct in_addr {
-    uint32_t s_addr; // that's a 32-bit int (4 bytes)
+    uint32_t s_addr; // eso es un int de 32 bits (4 bytes)
 };
 ```
 
-Whoa! Well, it _used_ to be a union, but now those days seem to be gone.
-Good riddance. So if you have declared `ina` to be of type `struct
-sockaddr_in`, then `ina.sin_addr.s_addr` references the 4-byte IP
-address (in Network Byte Order).  Note that even if your system still
-uses the God-awful union for `struct in_addr`, you can still reference
-the 4-byte IP address in exactly the same way as I did above (this due
-to `#define`s).
+¡Wow! Bueno, _solía ser_ una unión, pero ahora esos días quedaron en el
+pasado. ¡Buen viaje! Así que si declaraste una `ina` de tipo `struct
+sockaddr_in`, entonces `ina.sin_addr.s_addr` referencia a la dirección
+IP de 4 bytes (en orden de red). Notá que, incluso si tu sistema todavía
+usa la horrenda unión para `struct in_addr`, igualmente podés
+referenciar la dirección IP de 4 bytes de exactamente la misma forma que
+lo hice ahí arriba (por varios `#define`s que hay).
 
-What about [ix[IPv6]] IPv6? Similar `struct`s exist for it, as well:
+¿Y qué con [ix[IPv6]] IPv6? Hay `struct`s similares:
 
 ```{.c}
-// (IPv6 only--see struct sockaddr_in and struct in_addr for IPv4)
+// (Sólo IPv6 - mirá struct sockaddr_in y struct in_addr para IPv4)
 
 struct sockaddr_in6 {
-    u_int16_t       sin6_family;   // address family, AF_INET6
-    u_int16_t       sin6_port;     // port number, Network Byte Order
-    u_int32_t       sin6_flowinfo; // IPv6 flow information
-    struct in6_addr sin6_addr;     // IPv6 address
-    u_int32_t       sin6_scope_id; // Scope ID
+    u_int16_t       sin6_family;   // Familia de direcciones, AF_INET6
+    u_int16_t       sin6_port;     // Número de puerto, en Orden de Red
+    u_int32_t       sin6_flowinfo; // Información de flujo (flow) de IPv6
+    struct in6_addr sin6_addr;     // Dirección IPv6
+    u_int32_t       sin6_scope_id; // ID de ámbito (scope)
 };
 
 struct in6_addr {
-    unsigned char   s6_addr[16];   // IPv6 address
+    unsigned char   s6_addr[16];   // Dirección IPv6
 };
 ```
 
-Note that IPv6 has an IPv6 address and a port number, just like IPv4 has
-an IPv4 address and a port number.
+Notá que IPv6 tiene una dirección IPv6 y un número de puerto, tal como
+IPv4 tiene una dirección IPv4 y un número de puerto.
 
-Also note that I'm not going to talk about the IPv6 flow information or
-Scope ID fields for the moment... this is just a starter guide. `:-)`
+También sabé que no voy a hablar mucho de los campos de Información de
+Flujo o ID de ámbito de IPv6 por el momento... Esto es sólo una guía
+para principiantes. `:-)`
 
-Last but not least, here is another simple structure, `struct
-sockaddr_storage` that is designed to be large enough to hold both IPv4
-and IPv6 structures. See, for some calls, sometimes you don't know in
-advance if it's going to fill out your `struct sockaddr` with an IPv4 or
-IPv6 address. So you pass in this parallel structure, very similar to
-`struct sockaddr` except larger, and then cast it to the type you need:
+Última, pero no menos importante, esta esta otra estructura simple,
+`struct sockaddr_storage`, diseñada lo suficientemente grande para
+almacenar tanto estructuras IPv4 como IPv6. Para algunas llamadas, a
+veces no sabés de antemano si te va a completar tu `struct sockaddr` con
+una dirección IPv4 o una IPv6. Entonces le pasás esta estructura
+paralela, similar a `struct sockaddr` pero más grande, y después la
+casteás al tipo que necesites:
 
 ```{.c}
 struct sockaddr_storage {
-    sa_family_t  ss_family;     // address family
+    sa_family_t  ss_family;     // familia de la dirección
 
-    // all this is padding, implementation specific, ignore it:
+    // todo esto es relleno, específico de la implementación, ignoralo
     char      __ss_pad1[_SS_PAD1SIZE];
     int64_t   __ss_align;
     char      __ss_pad2[_SS_PAD2SIZE];
 };
 ```
 
-What's important is that you can see the address family in the
-`ss_family` field---check this to see if it's `AF_INET` or `AF_INET6`
-(for IPv4 or IPv6).  Then you can cast it to a `struct sockaddr_in` or
-`struct sockaddr_in6` if you wanna.
+Lo importante es que puedas ver la familia de la dirección en el campo
+`ss_family` - con esto te fijás si es `AF_INET` o `AF_INET6` (para IPv4
+o IPv6). Ahí ya podés castearla a `struct sockaddr_in` o `struct
+sockaddr_in6` si quisieras.
 
 
 ## IP Addresses, Part Deux
