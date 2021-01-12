@@ -1149,20 +1149,20 @@ o IPv6). Ahí ya podés castearla a `struct sockaddr_in` o `struct
 sockaddr_in6` si quisieras.
 
 
-## IP Addresses, Part Deux
+## Direcciones IP, Parte Dos
 
-Fortunately for you, there are a bunch of functions that allow you to
-manipulate [ix[IP]] IP addresses. No need to figure them out by hand and
-stuff them in a `long` with the `<<` operator.
+Por suerte para vos, hay un puñado de funciones que te ayudan a
+manipular [ix[IP]] direcciones IP. No hace interpretarlas manualmente y
+meter todo en un `long` con el operador `<<`.
 
-First, let's say you have a `struct sockaddr_in ina`, and you have an IP
-address "`10.12.110.57`" or "`2001:db8:63b3:1::3490`" that you want to
-store into it.  The function you want to use, [ixtt[inet\_pton()]]
-`inet_pton()`, converts an IP address in numbers-and-dots notation into
-either a `struct in_addr` or a `struct in6_addr` depending on whether
-you specify `AF_INET` or `AF_INET6`. ("`pton`" stands for "presentation
-to network"---you can call it "printable to network" if that's easier to
-remember.) The conversion can be made as follows:
+Primero, digamos que tenés una `struct sockaddr_in ina`, y tenés una
+dirección IP "`10.12.110.57`" or "`2001:db8:63b3:1::3490`" que querés
+almacenar en ella. La función que querés usar, [ixtt[inet\_pton()]]
+`inet_pton()`, convierte una dirección IP en notación números-y-puntos a
+una `struct in_addr` o `struct in6_addr` dependiendo de si le
+especificás `AF_INET` o `AF_INET6` ("`pton`" significa "presentación a
+red" - podés llamarla "imprimible (_printable_) a red") si te es más
+fácil de recordar). La conversión se puede hacer así:
 
 ```{.c}
 struct sockaddr_in sa; // IPv4
@@ -1172,60 +1172,59 @@ inet_pton(AF_INET, "10.12.110.57", &(sa.sin_addr)); // IPv4
 inet_pton(AF_INET6, "2001:db8:63b3:1::3490", &(sa6.sin6_addr)); // IPv6
 ```
 
-(Quick note: the old way of doing things used a function called
-[ixtt[inet\_addr()]] `inet_addr()` or another function called
-[ixtt[inet\_aton()]] `inet_aton()`; these are now obsolete and don't
-work with IPv6.)
+(Comentario rápido: la vieja forma de hacer esto era con una función
+llamada [ixtt[inet\_addr()]] `inet_addr()` u otra llamada
+[ixtt[inet\_aton()]] `inet_aton()`; ambas quedaron obsoletas y no
+funcionan con IPv6)
 
-Now, the above code snippet isn't very robust because there is no error
-checking. See, `inet_pton()` returns `-1` on error, or 0 if the address
-is messed up. So check to make sure the result is greater than 0 before
-using!
+Ahora, el fragmento de código acá arriba no es muy robusto, porque no
+tiene manejo de errores. Fijate, `inet_pton()` devuelve `-1` si hubo un
+error, o 0 si la dirección está en mal estado. ¡Así que revisá que el
+resultado sea mayor a 0 antes de usarlo!
 
-All right, now you can convert string IP addresses to their binary
-representations. What about the other way around? What if you have a
-`struct in_addr` and you want to print it in numbers-and-dots notation?
-(Or a `struct in6_addr` that you want in, uh, "hex-and-colons"
-notation.) In this case, you'll want to use the function
-[ixtt[inet\_ntop()]] `inet_ntop()` ("ntop" means "network to
-presentation"---you can call it "network to printable" if that's easier
-to remember), like this:
+Bien, ya podés convertir direcciones IP _textuales_ a su representación
+binaria. ¿Y al revés? ¿Qué onda si tenés un `struct in_addr` y querés
+imprimirla en su notación números-y-puntos? (o una `struct in6_addr` que
+quieras en notación, ehm, "hexa-y-dos-puntos") En este caso querrás usar
+la función [ixtt[inet\_ntop()]] `inet_ntop()` ("ntop" significa "red
+(network) a presentación" - podés llamarla "red a imprimible
+(printeable)" si te es más sencillo), así:
 
 ```{.c .numberLines}
 // IPv4:
 
-char ip4[INET_ADDRSTRLEN];  // space to hold the IPv4 string
-struct sockaddr_in sa;      // pretend this is loaded with something
+char ip4[INET_ADDRSTRLEN];  // espacio para guardar el string IPv4
+struct sockaddr_in sa;      // supongamos que esto tiene valores cargados
 
 inet_ntop(AF_INET, &(sa.sin_addr), ip4, INET_ADDRSTRLEN);
 
-printf("The IPv4 address is: %s\n", ip4);
+printf("La dirección IPv4 es: %s\n", ip4);
 
 
 // IPv6:
 
-char ip6[INET6_ADDRSTRLEN]; // space to hold the IPv6 string
-struct sockaddr_in6 sa6;    // pretend this is loaded with something
+char ip6[INET6_ADDRSTRLEN]; // espacio para guardar el string IPv6
+struct sockaddr_in6 sa6;    // supongamos que esto tiene valores cargados
 
 inet_ntop(AF_INET6, &(sa6.sin6_addr), ip6, INET6_ADDRSTRLEN);
 
-printf("The address is: %s\n", ip6);
+printf("La dirección es: %s\n", ip6);
 ```
 
-When you call it, you'll pass the address type (IPv4 or IPv6), the
-address, a pointer to a string to hold the result, and the maximum
-length of that string.  (Two macros conveniently hold the size of the
-string you'll need to hold the largest IPv4 or IPv6 address:
-`INET_ADDRSTRLEN` and `INET6_ADDRSTRLEN`.)
+Cuando la llames, le vas a pasar el tipo de dirección (IPv4 o IPv6), la
+dirección, un puntero a un string en que guardar el resultado, y la
+longitud máxima de ese string (hay dos macros que convenientemente
+representan el tamaño del string más grande que puedas necesitar para
+almacenar una dirección IPv4 o una IPv6: `INET_ADDRSTRLEN` y
+`INET6_ADDRSTRLEN`.)
 
-(Another quick note to mention once again the old way of doing things:
-the historical function to do this conversion was called
-[ixtt[inet\_ntoa()]] `inet_ntoa()`. It's also obsolete and won't work
-with IPv6.)
+(Otro comentario rápido para volver a mencionar cómo se hacía antes: la
+función histórica para esta conversión se llamaba [ixtt[inet\_ntoa()]]
+`inet_ntoa()`. También quedó obsoleta y no funciona con IPv6.)
 
-Lastly, these functions only work with numeric IP addresses---they won't
-do any nameserver DNS lookup on a hostname, like "`www.example.com`".
-You will use `getaddrinfo()` to do that, as you'll see later on.
+Por último, estas funciones sólo trabajan con direcciones IP numéricas -
+no hacen ningúna búsqueda de DNS de un nombre de host como
+"`www.example.com`". Más adelante vamos a usar `getaddrinfo()` para eso.
 
 
 ### Private (Or Disconnected) Networks
