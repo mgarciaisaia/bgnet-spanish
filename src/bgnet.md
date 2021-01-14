@@ -1286,67 +1286,70 @@ deberías necesitar NAT. Pero si querés asignarte direcciones en una red
 que no routee hacia el exterior, este es el modo de hacerlo.
 
 
-# Jumping from IPv4 to IPv6
+# Saltando de IPv4 a IPv6
 
-[ix[IPv6]] But I just want to know what to change in my code to get it
-going with IPv6! Tell me now!
+[ix[IPv6]] ¡Pero yo sólo quiero saber qué cambiar en mi código para
+hacerlo andar con IPv6! ¡Decime!
 
-Ok! Ok!
+¡Ok! ¡Ok!
 
-Almost everything in here is something I've gone over, above, but it's
-the short version for the impatient. (Of course, there is more than
-this, but this is what applies to the guide.)
+Casi todo en esta sección es algo que ya cubrí más arriba, pero es la
+versión corta para quienes sean impacientes (obviamente, hay mucho más
+que esto, pero esto es lo que aplica a esta guía).
 
-1. First of all, try to use [ixtt[getaddrinfo()]]
-   [`getaddrinfo()`](#structs) to get all the `struct sockaddr` info,
-   instead of packing the structures by hand. This will keep you IP
-   version-agnostic, and will eliminate many of the subsequent steps.
+1. Primero que nada, tratá de usar [ixtt[getaddrinfo()]]
+   [`getaddrinfo()`](#structs) para conseguir toda la información de las
+   `struct sockaddr` en lugar de completar las estructuras a mano. Esto
+   te va a mantener agnóstico de la versión de IP, y eliminar varios de
+   los problemas de los pasos siguientes.
 
-2. Any place that you find you're hard-coding anything related to the IP
-   version, try to wrap up in a helper function.
+2. En cualquier lado en que estés escribiendo algo relacionado a alguna
+   versión de IP, tratá de wrappearla dentro de una función helper.
 
-3. Change `AF_INET` to `AF_INET6`.
+3. Cambiá `AF_INET` a `AF_INET6`.
 
-4. Change `PF_INET` to `PF_INET6`.
+4. Cambiá `PF_INET` a `PF_INET6`.
 
-5. Change `INADDR_ANY` assignments to `in6addr_any` assignments, which
-   are slightly different:
+5. Cambiá las asignaciones de `INADDR_ANY` a asignaciones de
+   `in6addr_any`, que son un poco diferentes:
 
    ```{.c}
    struct sockaddr_in sa;
    struct sockaddr_in6 sa6;
    
-   sa.sin_addr.s_addr = INADDR_ANY;  // use my IPv4 address
-   sa6.sin6_addr = in6addr_any; // use my IPv6 address
+   sa.sin_addr.s_addr = INADDR_ANY;  // usa mi dirección IPv4
+   sa6.sin6_addr = in6addr_any; // usa mi dirección IPv6
    ```
 
-   Also, the value `IN6ADDR_ANY_INIT` can be used as an initializer when
-   the `struct in6_addr` is declared, like so:
+   También podés usar el valor `IN6ADDR_ANY_INIT` como inicializador
+   cuando declarás la `struct in6_addr`, así:
 
    ```{.c}
    struct in6_addr ia6 = IN6ADDR_ANY_INIT;
    ```
 
-6. Instead of `struct sockaddr_in` use `struct sockaddr_in6`, being sure
-   to add "6" to the fields as appropriate (see [`struct`s](#structs),
-   above). There is no `sin6_zero` field.
+6. En vez de `struct sockaddr_in`, usá `struct sockaddr_in6`,
+   asegurándote de agregarle "6" a los campos que corresponda (mirá
+   [`struct`s](#structs) más arriba). No hay campo `sin6_zero`.
 
-7. Instead of `struct in_addr` use `struct in6_addr`, being sure to add
-   "6" to the fields as appropriate (see [`struct`s](#structs), above).
+7. En vez de `struct in_addr`, usá `struct in6_addr`, asegurándote de
+   agregarle "6" a los campos que corresponda (mirá
+   [`struct`s](#structs) más arriba).
 
-8. Instead of `inet_aton()` or `inet_addr()`, use `inet_pton()`.
+8. En vez de `inet_aton()` o `inet_addr()`, usá `inet_pton()`.
 
-9. Instead of `inet_ntoa()`, use `inet_ntop()`.
+9. En vez de `inet_ntoa()`, usá `inet_ntop()`.
 
-10. Instead of `gethostbyname()`, use the superior `getaddrinfo()`.
+10. En vez de `gethostbyname()`, usá la superior `getaddrinfo()`.
 
-11. Instead of `gethostbyaddr()`, use the superior
-    [ixtt[getnameinfo()]] `getnameinfo()` (although `gethostbyaddr()`
-    can still work with IPv6).
+11. En vez de `gethostbyaddr()`, usá la superior
+    [ixtt[getnameinfo()]] `getnameinfo()` (aunque `gethostbyaddr()`
+    igual funciona con IPv6).
 
-12. `INADDR_BROADCAST` no longer works. Use IPv6 multicast instead.
+12. `INADDR_BROADCAST` no funciona más. Usá el multicast de IPv6 en su
+    lugar.
 
-_Et voila_!
+_¡Et voila!_
 
 
 # System Calls or Bust
