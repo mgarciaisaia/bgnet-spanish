@@ -1227,63 +1227,63 @@ no hacen ningúna búsqueda de DNS de un nombre de host como
 "`www.example.com`". Más adelante vamos a usar `getaddrinfo()` para eso.
 
 
-### Private (Or Disconnected) Networks
+### Redes privadas (o desconectadas)
 
-[ix[private network]] Lots of places have a [ix[firewall]] firewall that
-hides the network from the rest of the world for their own protection.
-And often times, the firewall translates "internal" IP addresses to
-"external" (that everyone else in the world knows) IP addresses using a
-process called _Network Address Translation_, or [ix[NAT]] NAT.
+[ix[private networks]] Muchos lugares tienen un [ix[firewall]] firewall
+que oculta a su red del resto del mundo para protegerla. Y, en general,
+el firewall traduce las direcciones IP "internas" a direcciones IP
+"externas" (que el resto del mundo conoce) usando un proceso llamado
+_Traducción de Direcciones de Red_ ("Network Address Translation"), o
+[ix[NAT]] NAT (por sus siglas en inglés).
 
-Are you getting nervous yet? "Where's he going with all this weird
-stuff?"
+¿Van subiendo los nervios? "¿A dónde va con todo esto?"
 
-Well, relax and buy yourself a non-alcoholic (or alcoholic) drink,
-because as a beginner, you don't even have to worry about NAT, since
-it's done for you transparently. But I wanted to talk about the network
-behind the firewall in case you started getting confused by the network
-numbers you were seeing.
+Buen, relajate y preparáte una bebida no-alcohólica (o alcohólica,
+buen), porque, como principiante, ni siquiera necesitás preocuparte por
+el NAT, dado que te lo resuelven de manera transparente. Pero quería
+hablarte de las redes detrás de un firewall para cuando te empieces a
+confundir por los números de red que estés viendo.
 
-For instance, I have a firewall at home. I have two static IPv4
-addresses allocated to me by the DSL company, and yet I have seven
-computers on the network. How is this possible? Two computers can't
-share the same IP address, or else the data wouldn't know which one to
-go to!
+Por ejemplo, yo tengo un firewall en mi casa. Tengo dos direcciones IPv4
+estáticas asignadas por mi compañía de DSL, y aún así tengo siete
+computadoras en la red. ¿Cómo es posible esto? Dos computadoras no
+pueden compartir la misma dirección IP, ¡porque si no los datos no
+sabrían a cuál de las dos ir!
 
-The answer is: they don't share the same IP addresses. They are on a
-private network with 24 million IP addresses allocated to it. They are
-all just for me.  Well, all for me as far as anyone else is concerned.
-Here's what's happening:
+La respuesta es: no comparten la misma dirección IP. Están en una red
+privada que tiene disponibles 24 millones de direcciones IP para ella.
+Son todas para mí. Bueno, al menos _así parece_ para cualquiera que
+mire. Lo que sucede es esto:
 
-If I log into a remote computer, it tells me I'm logged in from
-192.0.2.33 which is the public IP address my ISP has provided to me. But
-if I ask my local computer what its IP address is, it says 10.0.0.5. Who
-is translating the IP address from one to the other? That's right, the
-firewall! It's doing NAT!
+Si inicio sesión en una computadora remota, me dice que estoy iniciando
+sesión desde 192.0.2.33, que es la dirección IP pública que mi proveedor
+de Internet (ISP, por sus siglas en inglés) me asignó. Pero si le
+pregunto a mi computadora local cuál es su dirección IP, me dice
+10.0.0.5. ¿Quién está traduciendo de una dirección IP a la otra? Así es:
+¡el firewall! ¡Está NATeando!
 
-`10.x.x.x` is one of a few reserved networks that are only to be used
-either on fully disconnected networks, or on networks that are behind
-firewalls.  The details of which private network numbers are available
-for you to use are outlined in [flrfc[RFC 1918|1918]], but some common
-ones you'll see are [ix[10.x.x.x]] `10.x.x.x` and [ix[192.168.x.x]]
-`192.168.x.x`, where `x` is 0-255, generally. Less common is
-`172.y.x.x`, where `y` goes between 16 and 31.
+`10.x.x.x` es una de las pocas redes reservadas que sólo pueden usarse
+en redes totalmente desconectadas de Internet, o en redes detrás de un
+firewall. Los detalles de qué números de red privadas tenés disponibles
+para usar están en la [flrfc[RFC 1918|1918]], pero algunas comunes que
+vas a ver son [ix[10.x.x.x]] `10.x.x.x` y [ix[192.168.x.x]]
+`192.168.x.x`, donde `x` suele estar en el intervalo 0-255. Un poco
+menos común es `172.y.x.x`, donde `y` varía entre 16 y 31.
 
-Networks behind a NATing firewall don't _need_ to be on one of these
-reserved networks, but they commonly are.
+Las redes detrás de un firewall que NATea no _necesitan_ estar en una de
+esas redes reservadas, pero suelen estarlo.
 
-(Fun fact! My external IP address isn't really `192.0.2.33`. The
-`192.0.2.x` network is reserved for make-believe "real" IP addresses to
-be used in documentation, just like this guide! Wowzers!)
+(Como dato de color, mi dirección IP externa no es realmente
+`192.0.2.33`. La red `192.0.2.x` es una red reservada para simular
+direcciones IP "reales" al escribir documentación, ¡como esta guía!)
 
-[ix[IPv6]] IPv6 has private networks, too, in a sense. They'll start
-with `fdXX:` (or maybe in the future `fcXX:`), as per [flrfc[RFC
-4193|4193]].  NAT and IPv6 don't generally mix, however (unless you're
-doing the IPv6 to IPv4 gateway thing which is beyond the scope of this
-document)---in theory you'll have so many addresses at your disposal
-that you won't need to use NAT any longer. But if you want to allocate
-addresses for yourself on a network that won't route outside, this is
-how to do it.
+[ix[IPv6]] IPv6 también tiene redes privadas, por así decirlo. Empiezan
+con `fdXX:` (o quizá en el futuro `fcXX:`) según la [flrfc[RFC
+4193|4193]]. NAT e IPv6 no suelen mezclarse, igual (a menos que estés
+haciendo eso de interconectar IPv6 con IPv4, que está fuera del alcance
+de esta guía) - en teoría tenés tantas direcciones disponibles que ya no
+deberías necesitar NAT. Pero si querés asignarte direcciones en una red
+que no routee hacia el exterior, este es el modo de hacerlo.
 
 
 # Jumping from IPv4 to IPv6
