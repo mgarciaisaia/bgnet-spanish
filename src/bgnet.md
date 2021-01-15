@@ -1352,32 +1352,33 @@ que esto, pero esto es lo que aplica a esta guía).
 _¡Et voila!_
 
 
-# System Calls or Bust
+# Llamadas a sistema ("System calls") o reventar
 
-This is the section where we get into the system calls (and other
-library calls) that allow you to access the network functionality of a
-Unix box, or any box that supports the sockets API for that matter (BSD,
-Windows, Linux, Mac, what-have-you.) When you call one of these
-functions, the kernel takes over and does all the work for you
-automagically.
+Esta es la sección en que nos metemos en las llamadas a sistema (y
+otras llamadas a bibliotecas) que te permiten acceder a la funcionalidad
+de red de una máquina Unix, o cualquier máquina que soporte la API de
+sockets, al caso (BSD, Windows, Linux, Mac, el que se te ocurra). Cuando
+llamás a una de estas funciones, el kernel toma el control y hace todo
+el trabajo por vos automágicamente.
 
-The place most people get stuck around here is what order to call these
-things in. In that, the `man` pages are no use, as you've probably
-discovered. Well, to help with that dreadful situation, I've tried to
-lay out the system calls in the following sections in _exactly_
-(approximately) the same order that you'll need to call them in your
-programs.
+La parte más complicada para la mayoría de la gente es en qué orden
+llamar a estas cosas. Las páginas del `man` no ayudan mucho con eso,
+como puede que ya hayas descubierto. Bueno, para ayudar con ese problema
+espantoso, traté de ordenar las llamadas a sistema de las secciones
+siguientes en (aproximadamente) _exactamente_ el mismo orden en que vas
+a necesitar llamarlas en tus programas.
 
-That, coupled with a few pieces of sample code here and there, some milk
-and cookies (which I fear you will have to supply yourself), and some
-raw guts and courage, and you'll be beaming data around the Internet
-like the Son of Jon Postel!
+Eso, junto con algunos ejemplos de código por aquí y por allá, un café
+(que, me temo, te vas a tener que conseguir vos), algo de instinto y
+coraje, y ¡vas a estar mandando datos a través de la Internet como el
+hijo de Jon Postel!
 
-_(Please note that for brevity, many code snippets below do not include
-necessary error checking. And they very commonly assume that the result
-from calls to `getaddrinfo()` succeed and return a valid entry in the
-linked list. Both of these situations are properly addressed in the
-stand-alone programs, though, so use those as a model.)_
+_(Por favor notá que, en pos de la brevedad, la mayoría de los
+fragmentos de código debajo no incluyen el necesario chequeo de errores.
+Y en general asumen que las llamadas a `getaddrinfo()` dan resultados
+exitosos y devuelven una entrada válida en la lista enlazada. Ambas
+situaciones están manejadas como corresponde en los programas completos,
+igual, así que usá esos como modelo.)_
 
 
 ## `getaddrinfo()`---Prepare to launch!
