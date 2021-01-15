@@ -1381,126 +1381,131 @@ situaciones están manejadas como corresponde en los programas completos,
 igual, así que usá esos como modelo.)_
 
 
-## `getaddrinfo()`---Prepare to launch!
+## `getaddrinfo()` - ¡Preparándose para arrancar!
 
-[ixtt[getaddrinfo()]] This is a real workhorse of a function with a lot
-of options, but usage is actually pretty simple. It helps set up the
-`struct`s you need later on.
+[ixtt[getaddrinfo()]] Esta función es un verdadero caballito de batalla
+con un montón de opciones, pero usarla es bastante sencillo, en
+realidad. Te ayuda a configurar los `struct`s que vas a necesitar luego.
 
-A tiny bit of history: it used to be that you would use a function
-called `gethostbyname()` to do DNS lookups. Then you'd load that
-information by hand into a `struct sockaddr_in`, and use that in your
-calls.
+Un poco de historia: antes se solía usar una función llamada
+`gethostbyname()` para hacer búsquedas de DNS. Luego cargabas esa
+información a mano en un `struct sockaddr_in`, y usabas eso para tus
+llamadas.
 
-This is no longer necessary, thankfully. (Nor is it desirable, if you
-want to write code that works for both IPv4 and IPv6!)  In these modern
-times, you now have the function `getaddrinfo()` that does all kinds of
-good stuff for you, including DNS and service name lookups, and fills
-out the `struct`s you need, besides!
+Por suerte, eso ya no es necesario (ni recomendable, si querés que tu
+código funcione tanto con IPv4 como con IPv6). En estos tiempos modernos
+tenemos la función `getaddrinfo()` que te resuelve un montón de cosas
+geniales, incluyendo búsquedas de DNS y nombres de servicio, ¡y encima
+llena todos los `struct`s que necesitás!
 
-Let's take a look!
+¡Hechémosle un vistazo!
 
 ```{.c}
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netdb.h>
 
-int getaddrinfo(const char *node,     // e.g. "www.example.com" or IP
-                const char *service,  // e.g. "http" or port number
+int getaddrinfo(const char *node,     // e.g. "www.example.com" o IP
+                const char *service,  // e.g. "http" o número de puerto
                 const struct addrinfo *hints,
                 struct addrinfo **res);
 ```
 
-You give this function three input parameters, and it gives you a
-pointer to a linked-list, `res`, of results.
+Le dás tres parámetros de entrada a la función, y te devuelve un puntero
+a una lista enlazada, `res`, de resultados.
 
-The `node` parameter is the host name to connect to, or an IP address.
+El parámetro `node` ("nodo") es el nombre de host al que conectarse, o
+una dirección IP.
 
-Next is the parameter `service`, which can be a port number, like "80",
-or the name of a particular service (found in [fl[The IANA Port
-List|https://www.iana.org/assignments/port-numbers]] or the
-`/etc/services` file on your Unix machine) like "http" or "ftp" or
-"telnet" or "smtp" or whatever.
+El parámetro siguiente, `service` ("servicio"), puede ser un número de
+puerto, como "80", o el nombre de un servicio en particular (presente en
+la [fl[Lista de puertos de
+IANA|https://www.iana.org/assignments/port-numbers]] o el archivo
+`/etc/services` de tu Unix) como "http" o "ftp" o "telnet" o "smtp" o lo
+que sea.
 
-Finally, the `hints` parameter points to a `struct addrinfo` that you've
-already filled out with relevant information.
+Finalmente, el parámetro "hints" ("indicios") apunta a un `struct
+addrinfo` que hayas llenado previamente con la información relevante.
 
-Here's a sample call if you're a server who wants to listen on your
-host's IP address, port 3490. Note that this doesn't actually do any
-listening or network setup; it merely sets up structures we'll use
-later:
+Acá hay una llamada de ejemplo si sos un servidor que quiere escuchar en
+la dirección IP de tu host, en el puerto 3490. Notá que esto no se pone
+propiamente a escuchar conexiones o configurar la red; simplemente
+prepara las estructuras que vamos a usar luego:
 
 ```{.c .numberLines}
 int status;
 struct addrinfo hints;
-struct addrinfo *servinfo;  // will point to the results
+struct addrinfo *servinfo;  // va a apuntar a los resultados
 
-memset(&hints, 0, sizeof hints); // make sure the struct is empty
-hints.ai_family = AF_UNSPEC;     // don't care IPv4 or IPv6
-hints.ai_socktype = SOCK_STREAM; // TCP stream sockets
-hints.ai_flags = AI_PASSIVE;     // fill in my IP for me
+memset(&hints, 0, sizeof hints); // aseguramos que la estructura esté vacía
+hints.ai_family = AF_UNSPEC;     // no importa si IPv4 o IPv6
+hints.ai_socktype = SOCK_STREAM; // sockets stream TCP
+hints.ai_flags = AI_PASSIVE;     // completá mi IP por mí
 
 if ((status = getaddrinfo(NULL, "3490", &hints, &servinfo)) != 0) {
     fprintf(stderr, "getaddrinfo error: %s\n", gai_strerror(status));
     exit(1);
 }
 
-// servinfo now points to a linked list of 1 or more struct addrinfos
+// servinfo ahora apunta a una lista enlazada de 1 o más struct addrinfo's
 
-// ... do everything until you don't need servinfo anymore ....
+// ... hace todo hasta dejar de necesitar el servinfo ....
 
-freeaddrinfo(servinfo); // free the linked-list
+freeaddrinfo(servinfo); // liberá la lista enlazada
 ```
 
-Notice that I set the `ai_family` to `AF_UNSPEC`, thereby saying that I
-don't care if we use IPv4 or IPv6. You can set it to `AF_INET` or
-`AF_INET6` if you want one or the other specifically.
+Notá que puse el `ai_family` en `AF_UNSPEC`, declarando que no me
+importa si voy a usar IPv4 o IPv6. Podés ponerlo en `AF_INET` o
+`AF_INET6` si querés uno u otro específicamente.
 
-Also, you'll see the `AI_PASSIVE` flag in there; this tells
-`getaddrinfo()` to assign the address of my local host to the socket
-structures. This is nice because then you don't have to hardcode it. (Or
-you can put a specific address in as the first parameter to
-`getaddrinfo()` where I currently have `NULL`, up there.)
+Además, verás el flag `AI_PASSIVE` ahí; esto le dice a `getaddrinfo()`
+que asigne la dirección de mi máquina local a las estructuras de socket.
+Esto está bueno porque así no tengo que hardcodearla (o bien podrías
+poner una dirección específica en el primer parámetro de `getaddrinfo()`
+donde yo puse un `NULL` ahí arriba).
 
-Then we make the call. If there's an error (`getaddrinfo()` returns
-non-zero), we can print it out using the function `gai_strerror()`, as
-you see. If everything works properly, though, `servinfo` will point to
-a linked list of `struct addrinfo`s, each of which contains a `struct
-sockaddr` of some kind that we can use later! Nifty!
+Luego hacemos el llamado. Si hay un error (`getaddrinfo()` devuelve
+distinto de cero), podemos imprimirlo con la función `gai_strerror()`,
+como podrás ver. Si todo funciona normalmente, en cambio, `servinfo` va
+a apuntar a una lista enlazada de `struct addrinfo`s, cada uno de los
+cuales contiene una `struct sockaddr` de algún tipo que vamos a poder
+usar luego. ¡Cheto!
 
-Finally, when we're eventually all done with the linked list that
-`getaddrinfo()` so graciously allocated for us, we can (and should) free
-it all up with a call to `freeaddrinfo()`.
+Finalmente, cuando eventualmente hayamos terminado de usar la lista
+enlazada que `getaddrinfo()` tan gentilmente nos reservó, podemos (y
+debemos) liberarla con una llamada a `freeaddrinfo()`.
 
-Here's a sample call if you're a client who wants to connect to a
-particular server, say "www.example.net" port 3490. Again, this doesn't
-actually connect, but it sets up the structures we'll use later:
+Acá hay una llamada de ejemplo si sos un cliente que se quiere conectar
+a un servidor particular, digamos "www.example.net" en el puerto 3490.
+De nuevo, esto no hace la conexión propiamente dicha, si no que prepara
+las estructuras que vamos a necesitar luego:
 
 ```{.c .numberLines}
 int status;
 struct addrinfo hints;
-struct addrinfo *servinfo;  // will point to the results
+struct addrinfo *servinfo;  // va a apuntar a los resultados
 
-memset(&hints, 0, sizeof hints); // make sure the struct is empty
-hints.ai_family = AF_UNSPEC;     // don't care IPv4 or IPv6
-hints.ai_socktype = SOCK_STREAM; // TCP stream sockets
+memset(&hints, 0, sizeof hints); // aseguramos que la estructura esté vacía
+hints.ai_family = AF_UNSPEC;     // no importa si IPv4 o IPv6
+hints.ai_socktype = SOCK_STREAM; // sockets stream TCP
 
-// get ready to connect
+// nos preparamos para conectarnos
 status = getaddrinfo("www.example.net", "3490", &hints, &servinfo);
 
-// servinfo now points to a linked list of 1 or more struct addrinfos
+// servinfo ahora apunta a una lista enlazada de 1 o más struct addrinfo's
 
 // etc.
 ```
 
-I keep saying that `servinfo` is a linked list with all kinds of address
-information. Let's write a quick demo program to show off this
-information. [flx[This short program|showip.c]] will print the IP
-addresses for whatever host you specify on the command line:
+Sigo insistiendo con que `servinfo` es una lista enlazada con distintos
+tipos de información de direcciones. Escribamos rápidaamente un programa
+de ejemplo para mostrar esta información. [flx[Este pequeño
+programa|showip.c]] va a imprimir las direcciones IP del host que sea
+que especifiques en la línea de comandos:
 
 ```{.c .numberLines}
 /*
-** showip.c -- show IP addresses for a host given on the command line
+** showip.c -- muestra las direcciones IP de un host pasado por línea de comandos
 */
 
 #include <stdio.h>
@@ -1523,7 +1528,7 @@ int main(int argc, char *argv[])
     }
 
     memset(&hints, 0, sizeof hints);
-    hints.ai_family = AF_UNSPEC; // AF_INET or AF_INET6 to force version
+    hints.ai_family = AF_UNSPEC; // AF_INET o AF_INET6 para forzar una versión
     hints.ai_socktype = SOCK_STREAM;
 
     if ((status = getaddrinfo(argv[1], NULL, &hints, &res)) != 0) {
@@ -1531,14 +1536,14 @@ int main(int argc, char *argv[])
         return 2;
     }
 
-    printf("IP addresses for %s:\n\n", argv[1]);
+    printf("Direcciones IP de %s:\n\n", argv[1]);
 
     for(p = res;p != NULL; p = p->ai_next) {
         void *addr;
         char *ipver;
 
-        // get the pointer to the address itself,
-        // different fields in IPv4 and IPv6:
+        // consigo el puntero a la dirección propiamente dicha,
+        // campos distintos en IPv4 e IPv6:
         if (p->ai_family == AF_INET) { // IPv4
             struct sockaddr_in *ipv4 = (struct sockaddr_in *)p->ai_addr;
             addr = &(ipv4->sin_addr);
@@ -1549,43 +1554,44 @@ int main(int argc, char *argv[])
             ipver = "IPv6";
         }
 
-        // convert the IP to a string and print it:
+        // convierto la IP a string y lo imprimo:
         inet_ntop(p->ai_family, addr, ipstr, sizeof ipstr);
         printf("  %s: %s\n", ipver, ipstr);
     }
 
-    freeaddrinfo(res); // free the linked list
+    freeaddrinfo(res); // libero la lista enlazada
 
     return 0;
 }
 ```
 
-As you see, the code calls `getaddrinfo()` on whatever you pass on the
-command line, that fills out the linked list pointed to by `res`, and
-then we can iterate over the list and print stuff out or do whatever.
+Como se puede ver, el código llama a `getaddrinfo()` con lo que sea que
+le pases en la línea de comandos, lo que llena la lista enlazada
+apuntada por `res`, y luego iteramos la lista imprimiendo su contenido o
+haciendo lo que queramos con eso.
 
-(There's a little bit of ugliness there where we have to dig into the
-different types of `struct sockaddr`s depending on the IP version. Sorry
-about that! I'm not sure of a better way around it.)
+(Quedó un poco feo el código para revisar los distintos tipos de `struct
+sockaddr`s dependiendo de la versión de IP. ¡Perdón por eso! No se me
+ocurre alternativa mejor.)
 
-Sample run! Everyone loves screenshots:
+¡Ejecución de muestra! ¿Quién no ama las capturas de pantalla?
 
 ```
 $ showip www.example.net
-IP addresses for www.example.net:
+Direcciones IP de www.example.net:
 
   IPv4: 192.0.2.88
 
 $ showip ipv6.example.com
-IP addresses for ipv6.example.com:
+Direcciones IP de ipv6.example.com:
 
   IPv4: 192.0.2.101
   IPv6: 2001:db8:8c00:22::171
 ```
 
-Now that we have that under control, we'll use the results we get from
-`getaddrinfo()` to pass to other socket functions and, at long last, get
-our network connection established! Keep reading!
+Ahora que tenemos eso bajo control, vamos a usar los resultados que nos
+da `getaddrinfo()` para pasarlos a otras funciones de sockets y, por
+fin, ¡conseguir establecer nuestra conexión de red! ¡Seguí leyendo!
 
 
 ## `socket()`---Get the File Descriptor! {#socket}
