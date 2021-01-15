@@ -1594,10 +1594,10 @@ da `getaddrinfo()` para pasarlos a otras funciones de sockets y, por
 fin, ¡conseguir establecer nuestra conexión de red! ¡Seguí leyendo!
 
 
-## `socket()`---Get the File Descriptor! {#socket}
+## `socket()`- ¡Conseguí el descriptor de archivo! {#socket}
 
-I guess I can put it off no longer---I have to talk about the
-[ixtt[socket()]] `socket()` system call. Here's the breakdown:
+Creo que ya no puedo demorarlo más - tengo que hablar de la llamada a
+sistema [ixtt[socket()]] `socket()`. Este es el detalle:
 
 ```{.c}
 #include <sys/types.h>
@@ -1606,56 +1606,59 @@ I guess I can put it off no longer---I have to talk about the
 int socket(int domain, int type, int protocol); 
 ```
 
-But what are these arguments? They allow you to say what kind of socket
-you want (IPv4 or IPv6, stream or datagram, and TCP or UDP).
+Pero, ¿qué son estos parámetros? Te permiten decir qué tipo de socket
+querés (IPv4 o IPv6, stream o datagrama, y TCP o UDP).
 
-It used to be people would hardcode these values, and you can absolutely
-still do that. (`domain` is `PF_INET` or `PF_INET6`, `type` is
-`SOCK_STREAM` or `SOCK_DGRAM`, and `protocol` can be set to `0` to
-choose the proper protocol for the given `type`. Or you can call
-`getprotobyname()` to look up the protocol you want, "tcp" or "udp".)
+La gente solía hardcodear estos valores, y de hecho todavía podés
+hacerlo (`domain` es `PF_INET` o `PF_INET6`, `type` es `SOCK_STREAM` o
+`SOCK_DGRAM`, y `protocol` puede ir en `0` para elegir el protocolo
+correcto para el `type` determinado. O podés llamar a `getprotobyname()`
+para buscar el protocolo que querés, "tcp" o "udp").
 
-(This `PF_INET` thing is a close relative of the [ixtt[AF\_INET]]
-`AF_INET` that you can use when initializing the `sin_family` field in
-your `struct sockaddr_in`. In fact, they're so closely related that they
-actually have the same value, and many programmers will call `socket()`
-and pass `AF_INET` as the first argument instead of `PF_INET`. Now, get
-some milk and cookies, because it's time for a story. Once upon a time,
-a long time ago, it was thought that maybe an address family (what the
-"AF" in "`AF_INET`" stands for) might support several protocols that
-were referred to by their protocol family (what the "PF" in "`PF_INET`"
-stands for). That didn't happen. And they all lived happily ever after,
-The End. So the most correct thing to do is to use `AF_INET` in your
-`struct sockaddr_in` and `PF_INET` in your call to `socket()`.)
+(Esta cosa `PF_INET` es pariente cercana del [ixtt[AF\_INET]] `AF_INET`
+que podés usar al inicializar el campo `sin_family` de un `struct
+sockaddr_in`. De hecho, están tan emparentados que incluso tienen el
+mismo valor, y much@s programadores llaman a `socket()` pasándole
+`AF_INET` como primer parámetro en lugar de `PF_INET`. Pero, acomodate y
+escuchame, porque es tiempo de una historia. Una vez, hace mucho, mucho
+tiempo, estaba la idea de que una familia de direcciones (lo que "AF"
+significa en "AF_INET": "Address Family") podría soportar varios
+protocolos que fueran referenciados por su familia de protocolos (lo que
+"PF" significa en "PF_INET": "Protocol Family"). Eso nunca sucedió. Y
+vivieron felices por siempre, FIN. Así que lo más correcto es usar
+`AF_INET` en tu `struct sockaddr_in` y `PF_INET` en tu llamada a
+`socket()`.)
 
-Anyway, enough of that. What you really want to do is use the values
-from the results of the call to `getaddrinfo()`, and feed them into
-`socket()` directly like this:
+Como sea, suficiente. Lo que realmente querés hacer es usar los valores
+de los resultados de la llamada a `getaddrinfo()` y dárselos directo a
+`socket()`, así:
 
 ```{.c .numberLines}
 int s;
 struct addrinfo hints, *res;
 
-// do the lookup
-// [pretend we already filled out the "hints" struct]
+// hago la búsqueda
+// [hacé de cuenta que ya llenamos la estructura "hints"]
 getaddrinfo("www.example.com", "http", &hints, &res);
 
-// again, you should do error-checking on getaddrinfo(), and walk
-// the "res" linked list looking for valid entries instead of just
-// assuming the first one is good (like many of these examples do).
-// See the section on client/server for real examples.
+// de nuevo, deberías chequear errores de getaddrinfo(), y recorrer la
+// lista enlazada "res" buscando entradas válidas en lugar de
+// simplemente asumir que la primera es buena (como hacen muchos de
+// estos ejemplos). Mirá la sección de cliente/servidor para ejemplos
+// reales.
 
 s = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
 ```
 
-`socket()` simply returns to you a _socket descriptor_ that you can use
-in later system calls, or `-1` on error. The global variable `errno` is
-set to the error's value (see the [`errno`](#errnoman) man page for more
-details, and a quick note on using `errno` in multithreaded programs).
+`socket()` simplemente te devuelve un _descriptor de socket_ que podés
+usar en llamadas a sistema futuras, o un `-1` si hubo errores. La
+variable global `errno` toma el valor del error (mirá la página del
+manual de [`errno`](#errnoman) para más detalles, y un comentario sobre
+el uso de `errno` en programas multi-hilo).
 
-Fine, fine, fine, but what good is this socket? The answer is that it's
-really no good by itself, and you need to read on and make more system
-calls for it to make any sense.
+Bien, bien, bien, pero... ¿Para qué sirve este socket? La respuesta es
+que no sirve para nada por sí mismo, y vas a tener que seguir leyendo y
+haciendo más llamadas a sistema para que tenga sentido.
 
 
 ## `bind()`---What port am I on? {#bind}
