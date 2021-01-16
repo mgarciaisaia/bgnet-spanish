@@ -1907,20 +1907,20 @@ más completo). La parte realmente complicada de todo este baile es la
 llamada a `accept()`.
 
 
-## `accept()`---"Thank you for calling port 3490."
+## `accept()` - "Gracias por llamar al puerto 3490"
 
-[ixtt[accept()]] Get ready---the `accept()` call is kinda weird! What's
-going to happen is this: someone far far away will try to `connect()` to
-your machine on a port that you are `listen()`ing on. Their connection
-will be queued up waiting to be `accept()`ed. You call `accept()` and
-you tell it to get the pending connection. It'll return to you a _brand
-new socket file descriptor_ to use for this single connection! That's
-right, suddenly you have _two socket file descriptors_ for the price of
-one! The original one is still listening for more new connections, and
-the newly created one is finally ready to `send()` and `recv()`. We're
-there! 
+[ixtt[accept()]] ¡Preparate - la llamada `accept()` es un tanto extraña!
+Lo que va a pasar es esto: alguien desde algún lugar va a tratar de
+hacer `connect()` a tu máquina en un puerto en el que estés haciendo
+`listen()`. Su conexión se va a encolar esperando a que le hagas
+`accept()`. Vos llamás a `accept()` y le pedís que te consiga la
+conexión pendiente. ¡Y te va a devolver _un nuevo descriptor de archivo
+socket_ para usar específicamente para esta conexión! Así es, de repente
+¡vas a tener _dos descriptores de archivo socket_ por el precio de uno!
+El original va a seguir escuchando nuevas conexiones, y el nuevo está
+finalmente listo para hacer `send()` y `recv()`. ¡Ya llegamos!
 
-The call is as follows:
+La llamada es así:
 
 ```{.c}
 #include <sys/types.h>
@@ -1929,20 +1929,21 @@ The call is as follows:
 int accept(int sockfd, struct sockaddr *addr, socklen_t *addrlen); 
 ```
 
-`sockfd` is the `listen()`ing socket descriptor. Easy enough. `addr`
-will usually be a pointer to a local `struct sockaddr_storage`. This is
-where the information about the incoming connection will go (and with it
-you can determine which host is calling you from which port). `addrlen`
-is a local integer variable that should be set to `sizeof(struct
-sockaddr_storage)` before its address is passed to `accept()`.
-`accept()` will not put more than that many bytes into `addr`. If it
-puts fewer in, it'll change the value of `addrlen` to reflect that.
+`sockfd` es el descriptor de socket al que le hiciste `listen()`. Fácil.
+`addr` suele ser el puntero a un `struct sockaddr_storage` local. Acá es
+donde se va a guardar la información sobre la conexión entrante (y con
+ella vas a poder determinar qué host te está llamando desde qué puerto).
+`addrlen` es una variable entera local que deberías asignar con
+`sizeof(struct sockaddr_storage)` antes de pasarle esa dirección a
+`accept()`. `accept()` no va a escribir más que esa cantidad de bytes en
+`addr`. Si escribe menos, va a cambiar el valor de `addrlen` para
+reflejarlo.
 
-Guess what? `accept()` returns `-1` and sets `errno` if an error occurs.
-Betcha didn't figure that.
+Adiviná qué. `accept()` devuelve `-1` y escribe `errno` si ocurre un
+error. ¡No te la esperabas, ¿eh?!
 
-Like before, this is a bunch to absorb in one chunk, so here's a sample
-code fragment for your perusal:
+Como antes, es un montón para absorber de una, así que acá hay un
+fragmento de código de ejemplo para tu deleite:
 
 ```{.c .numberLines}
 #include <string.h>
@@ -1950,8 +1951,8 @@ code fragment for your perusal:
 #include <sys/socket.h>
 #include <netdb.h>
 
-#define MYPORT "3490"  // the port users will be connecting to
-#define BACKLOG 10     // how many pending connections queue will hold
+#define MYPORT "3490"  // el puerto al que se van a conectar l@s usuari@s
+#define BACKLOG 10     // cuántas conexiones pendientes encolar
 
 int main(void)
 {
@@ -1960,38 +1961,39 @@ int main(void)
     struct addrinfo hints, *res;
     int sockfd, new_fd;
 
-    // !! don't forget your error checking for these calls !!
+    // ¡¡ no te olvides de chequear errores en estas llamadas !!
 
-    // first, load up address structs with getaddrinfo():
+    // primero, cargamos las estructuras con getaddrinfo():
 
     memset(&hints, 0, sizeof hints);
-    hints.ai_family = AF_UNSPEC;  // use IPv4 or IPv6, whichever
+    hints.ai_family = AF_UNSPEC;  // no importa si IPv4 o IPv6
     hints.ai_socktype = SOCK_STREAM;
-    hints.ai_flags = AI_PASSIVE;     // fill in my IP for me
+    hints.ai_flags = AI_PASSIVE;     // completá mi IP por mí
 
     getaddrinfo(NULL, MYPORT, &hints, &res);
 
-    // make a socket, bind it, and listen on it:
+    // creo un socket, lo bindeo, y escucho:
 
     sockfd = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
     bind(sockfd, res->ai_addr, res->ai_addrlen);
     listen(sockfd, BACKLOG);
 
-    // now accept an incoming connection:
+    // ahora acepto una conexión entrante:
 
     addr_size = sizeof their_addr;
     new_fd = accept(sockfd, (struct sockaddr *)&their_addr, &addr_size);
 
-    // ready to communicate on socket descriptor new_fd!
+    // ¡todo listo para comunicarse por el descriptor de socket new_fd!
     .
     .
     .
 ```
 
-Again, note that we will use the socket descriptor `new_fd` for all
-`send()` and `recv()` calls. If you're only getting one single
-connection ever, you can `close()` the listening `sockfd` in order to
-prevent more incoming connections on the same port, if you so desire.
+Otra vez, notá que vamos a usar el descriptor de socket `new_fd` para
+todas las llamadas a `send()` y `recv()`. Si sólo querés aceptar una
+única conexión entrante, podés _cerrar_ (hacerle `close()`) al `sockfd`
+que estaba escuchando, para evitar más conexiones entrantes en el mismo
+puerto, si quisieras.
 
 
 ## `send()` and `recv()`---Talk to me, baby! {#sendrecv}
