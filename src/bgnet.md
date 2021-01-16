@@ -1661,19 +1661,20 @@ que no sirve para nada por sí mismo, y vas a tener que seguir leyendo y
 haciendo más llamadas a sistema para que tenga sentido.
 
 
-## `bind()`---What port am I on? {#bind}
+## `bind()` - ¿En qué puerto estoy? {#bind}
 
-[ixtt[bind()]] Once you have a socket, you might have to associate that
-socket with a [ix[port]] port on your local machine. (This is commonly
-done if you're going to [ixtt[listen()]] `listen()` for incoming
-connections on a specific port---multiplayer network games do this when
-they tell you to "connect to 192.168.5.10 port 3490".) The port number
-is used by the kernel to match an incoming packet to a certain process's
-socket descriptor. If you're going to only be doing a [ixtt[connect()]]
-`connect()` (because you're the client, not the server), this is
-probably be unnecessary. Read it anyway, just for kicks.
+[ixtt[bind()]] Una vez que tenés un socket, puede que tengas que asociar
+ese socket a un [ix[port]] puerto en tu máquina local (esto lo hacés
+generalmente cuando vas a hacer [ixtt[listen()]] `listen()` para
+_escuchar_ conexiones entrantes en un puerto específico - esto es lo que
+hacen los juegos en red cuando te dicen que te "conectes a 192.168.5.10
+en el puerto 3490"). El kernel usa el número de puerto para encontrar a
+qué descriptor de sockets de qué proceso enviar un paquete entrante. Si
+únicamente vas a hacer [ixtt[connect()]] `connect()` (porque sos el
+cliente, y no el servidor), probablemente no necesites hacer esto. Pero
+leelo igual, por las dudas.
 
-Here is the synopsis for the `bind()` system call:
+Acá está la sinopsis de la llamada a sistema `bind()`:
 
 ```{.c}
 #include <sys/types.h>
@@ -1682,52 +1683,53 @@ Here is the synopsis for the `bind()` system call:
 int bind(int sockfd, struct sockaddr *my_addr, int addrlen);
 ```
 
-`sockfd` is the socket file descriptor returned by `socket()`. `my_addr`
-is a pointer to a `struct sockaddr` that contains information about your
-address, namely, port and [ix[IP]] IP address. `addrlen` is the length
-in bytes of that address.
+`sockfd` es el descriptor de archivo socket que te devolvió `socket()`.
+`my_addr` es un puntero a un `struct sockaddr` que contiene información
+sobre tu dirección, principalmente puerto y [ix[IP]] dirección IP.
+`addrlen` es la longitud en bytes de esa dirección.
 
-Whew. That's a bit to absorb in one chunk. Let's have an example that
-binds the socket to the host the program is running on, port 3490:
+Uff, eso fue un montón para absorber de una. Veamos un ejemplo que
+asocia (_bindea_) el socket al host en que está corriendo el programa,
+en el puerto 3490:
 
 ```{.c .numberLines}
 struct addrinfo hints, *res;
 int sockfd;
 
-// first, load up address structs with getaddrinfo():
+// primero, cargamos las estructuras con getaddrinfo():
 
 memset(&hints, 0, sizeof hints);
-hints.ai_family = AF_UNSPEC;  // use IPv4 or IPv6, whichever
+hints.ai_family = AF_UNSPEC;  // no importa si IPv4 o IPv6
 hints.ai_socktype = SOCK_STREAM;
-hints.ai_flags = AI_PASSIVE;     // fill in my IP for me
+hints.ai_flags = AI_PASSIVE;     // completá mi IP por mí
 
 getaddrinfo(NULL, "3490", &hints, &res);
 
-// make a socket:
+// creo un socket:
 
 sockfd = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
 
-// bind it to the port we passed in to getaddrinfo():
+// lo asocio al puerto que le pasamos a getaddrinfo():
 
 bind(sockfd, res->ai_addr, res->ai_addrlen);
 ```
 
-By using the `AI_PASSIVE` flag, I'm telling the program to bind to the
-IP of the host it's running on. If you want to bind to a specific local
-IP address, drop the `AI_PASSIVE` and put an IP address in for the first
-argument to `getaddrinfo()`.
+Al usar el flag `AI_PASSIVE` le estoy diciendo al programa que bindee a
+la IP del host en que está corriendo. Si querés bindearte a una
+dirección IP local específica, descartá el `AI_PASSIVE` y poné esa
+dirección IP en el primer parámetro de `getaddrinfo()`.
 
-`bind()` also returns `-1` on error and sets `errno` to the error's
-value.
+`bind()` también devuelve `-1` cuando falla y completa `errno` con el
+valor del error.
 
-Lots of old code manually packs the `struct sockaddr_in` before calling
-`bind()`. Obviously this is IPv4-specific, but there's really nothing
-stopping you from doing the same thing with IPv6, except that using
-`getaddrinfo()` is going to be easier, generally. Anyway, the old code
-looks something like this:
+Hay mucho código viejo que completa el `struct sockaddr_in` a mano antes
+de llamar a `bind()`. Obviamente, esto es específico de IPv4, pero nada
+evita que hagas lo mismo para IPv6, excepto que, en general, te va a
+resultar más sencillo usar `getaddrinfo()`. Como sea, la vieja forma de
+hacerlo tenía esta pinta:
 
 ```{.c .numberLines}
-// !!! THIS IS THE OLD WAY !!!
+// ¡¡¡ ESTA ES LA FORMA VIEJA !!!
 
 int sockfd;
 struct sockaddr_in my_addr;
@@ -1735,53 +1737,52 @@ struct sockaddr_in my_addr;
 sockfd = socket(PF_INET, SOCK_STREAM, 0);
 
 my_addr.sin_family = AF_INET;
-my_addr.sin_port = htons(MYPORT);     // short, network byte order
+my_addr.sin_port = htons(MYPORT);     // short, en orden de red
 my_addr.sin_addr.s_addr = inet_addr("10.12.110.57");
 memset(my_addr.sin_zero, '\0', sizeof my_addr.sin_zero);
 
 bind(sockfd, (struct sockaddr *)&my_addr, sizeof my_addr);
 ```
 
-In the above code, you could also assign `INADDR_ANY` to the `s_addr`
-field if you wanted to bind to your local IP address (like the
-`AI_PASSIVE` flag, above).  The IPv6 version of `INADDR_ANY` is a global
-variable `in6addr_any` that is assigned into the `sin6_addr` field of
-your `struct sockaddr_in6`. (There is also a macro `IN6ADDR_ANY_INIT`
-that you can use in a variable initializer.)
+En ese código también podrías asignar `INADDR_ANY` al campo `s_addr` si
+quisieras bindear a tu dirección IP local (como el flag `AI_PASSIVE` que
+vimos antes). La versión IPv6 de `INADDR_ANY` es una variable global
+`in6addr_any` que tenés que asignar al campo `sin6_addr` de tu `struct
+sockaddr_in6` (también hay una macro `IN6ADDR_ANY_INIT` que podés usar
+al inicializar variables).
 
-Another thing to watch out for when calling `bind()`: don't go
-underboard with your port numbers. [ix[port]] All ports below 1024 are
-RESERVED (unless you're the superuser)! You can have any port number
-above that, right up to 65535 (provided they aren't already being used
-by another program).
+Otra cosa a la que prestar atención cuando llamás a `bind()`: no uses
+puertos bajos. [ix[port]] Los puertos debajo del 1024 son RESERVADOS (¡a
+menos que seas root!). Podés usar cualquier puerto arriba de ese, hasta
+el 65535 (siempre y cuando no esté siendo usado por otro programa).
 
-Sometimes, you might notice, you try to rerun a server and `bind()`
-fails, claiming [ix[Address already in use]] "Address already in use."
-What does that mean? Well, a little bit of a socket that was connected
-is still hanging around in the kernel, and it's hogging the port. You
-can either wait for it to clear (a minute or so), or add code to your
-program allowing it to reuse the port, like this:
+A veces, quizá lo notes, intentás volver a ejecutar un servidor y
+`bind()` falla, diciendo que [ix[Address already in use]] "Address
+already in use" (_"Dirección en uso"_). ¿Qué significa esto? Bueno,
+alguna partecita de un socket que estuvo conectado todavía queda dando
+vueltas por el kernel, manteniendo el puerto ocupado. Bien podés esperar
+a que lo libere (un minuto, más o menos), o agregar código a tu programa
+para que reuse el puerto, así:
 
 [ixtt[setsockopt()]] [ixtt[SO\_REUSEADDR]]
 
 ```{.c .numberLines}
 int yes=1;
-//char yes='1'; // Solaris people use this
+//char yes='1'; // La gente de Solaris use esto
 
-// lose the pesky "Address already in use" error message
+// evitar el mensaje de error molesto de "Address already in use"
 if (setsockopt(listener,SOL_SOCKET,SO_REUSEADDR,&yes,sizeof yes) == -1) {
     perror("setsockopt");
     exit(1);
 } 
 ```
 
-[ixtt[bind()]] One small extra final note about `bind()`: there are
-times when you won't absolutely have to call it. If you are
-[ixtt[connect()]] `connect()`ing to a remote machine and you don't care
-what your local port is (as is the case with `telnet` where you only
-care about the remote port), you can simply call `connect()`, it'll
-check to see if the socket is unbound, and will `bind()` it to an unused
-local port if necessary.
+[ixtt[bind()]] Un último comentario sobre `bind()`: hay veces en que no
+necesitás llamarla. Si vas a hacer [ixtt[connect()]] `connect()` a una
+máquina remota y no te importa desde qué puerto local (como el caso de
+`telnet`, en que sólo te importa el puerto remoto), podés llamara a
+`connect()` directamente, que mirará que el socket no está bindeado y lo
+`bind()`eará a un puerto local libre si fuera necesario.
 
 
 ## `connect()`---Hey, you! {#connect}
