@@ -1785,19 +1785,20 @@ máquina remota y no te importa desde qué puerto local (como el caso de
 `bind()`eará a un puerto local libre si fuera necesario.
 
 
-## `connect()`---Hey, you! {#connect}
+## `connect()` - ¡Hey, vos! {#connect}
 
-[ixtt[connect()]] Let's just pretend for a few minutes that you're a
-telnet application. Your user commands you (just like in the movie
-[ix[TRON]] _TRON_) to get a socket file descriptor. You comply and call
-`socket()`. Next, the user tells you to connect to "`10.12.110.57`" on
-port "`23`" (the standard telnet port). Yow! What do you do now?
+[ixtt[connect()]] Hagamos de cuenta por unos minutos que sos la
+aplicación telnet. Tu usuari@ te ordena (como en la película [ix[TRON]]
+_TRON_) que consigas un descriptor de archivo socket. Vos cumplís y
+llamás a `socket()`. Luego, tu usuari@ te dice que te conectes a
+"`10.12.110.57`" en el puerto "`23`" (el puerto estándar de telnet).
+¡Oh! ¿Y ahora qué hacés?
 
-Lucky for you, program, you're now perusing the section on
-`connect()`---how to connect to a remote host. So read furiously onward!
-No time to lose!
+Por suerte para vos, programa, ahora estás leyendo la sección sobre
+`connect()` - cómo conectarse a un host remoto. ¡Así que seguí leyendo!
+¡No hay tiempo que perder!
 
-The `connect()` call is as follows:
+La llamada `connect()` tiene esta pinta:
 
 ```{.c}
 #include <sys/types.h>
@@ -1806,23 +1807,24 @@ The `connect()` call is as follows:
 int connect(int sockfd, struct sockaddr *serv_addr, int addrlen); 
 ```
 
-`sockfd` is our friendly neighborhood socket file descriptor, as
-returned by the `socket()` call, `serv_addr` is a `struct sockaddr`
-containing the destination port and IP address, and `addrlen` is the
-length in bytes of the server address structure.
+`sockfd` es nuestro ya amigo descriptor de archivo socket, devuelto por
+la llamada `socket()`; `serv_addr` es un `struct sockadder` que contiene
+la dirección IP y puerto destino, y `addrlen` es la longitud en bytes de
+esa estructura con la dirección del servidor.
 
-All of this information can be gleaned from the results of the
-`getaddrinfo()` call, which rocks.
+A toda esta información la podemos sacar de los resultados de llamar a
+`getaddrinfo()`, así que buenísimo.
 
-Is this starting to make more sense? I can't hear you from here, so I'll
-just have to hope that it is. Let's have an example where we make a
-socket connection to "`www.example.com`", port `3490`:
+¿Está empezando a tener sentido todo esto? No te puedo escuchar desde
+acá, así que sólo me queda confiar en que sí. Veamos un ejemplo en el
+que hacemos una conexión de sockets a "`www.example.com`" en el puerto
+`3490`:
 
 ```{.c .numberLines}
 struct addrinfo hints, *res;
 int sockfd;
 
-// first, load up address structs with getaddrinfo():
+// primero, cargamos las estructuras con getaddrinfo():
 
 memset(&hints, 0, sizeof hints);
 hints.ai_family = AF_UNSPEC;
@@ -1830,29 +1832,31 @@ hints.ai_socktype = SOCK_STREAM;
 
 getaddrinfo("www.example.com", "3490", &hints, &res);
 
-// make a socket:
+// creo un socket:
 
 sockfd = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
 
-// connect!
+// ¡a conectarse!
 
 connect(sockfd, res->ai_addr, res->ai_addrlen);
 ```
 
-Again, old-school programs filled out their own `struct sockaddr_in`s to
-pass to `connect()`. You can do that if you want to. See the similar
-note in the [`bind()` section](#bind), above.
+Una vez más, los programas viejos completaban sus `struct sockaddr_in`s
+a mano para pasarselas a `connect()`. Podés hacerlo si querés. Fijate el
+comentario similar en [la sección de `bind()`](#bind) más arriba.
 
-Be sure to check the return value from `connect()`---it'll return `-1`
-on error and set the variable `errno`.
+Asegurate de verificar el valor de retorno de `connect()` - va a
+devolver `-1` cuando falle, y asignar la variable `errno`.
 
-<!-- latex index here so we can get the subindex entry after the tt -->
+<!-- índice de latex index acá para poder conseguir la entrada del -->
+<!-- subíndice luego del tt -->
 [ix[bind()@\texttt{bind()}!implicit]]
 
-Also, notice that we didn't call `bind()`. Basically, we don't care
-about our local port number; we only care where we're going (the remote
-port). The kernel will choose a local port for us, and the site we
-connect to will automatically get this information from us. No worries.
+Además, fijate que no llamamos a `bind()`. Básicamente, no nos importa
+nuestro número de puerto local; sólo nos importa a dónde estamos yendo
+(el puerto remoto). El kernel nos va a elegir un puerto local, y el
+sitio al que nos conectemos va a conseguir esta información
+automáticamente de nuestra parte. Sin problemas.
 
 
 ## `listen()`---Will somebody please call me? {#listen}
