@@ -1859,48 +1859,52 @@ sitio al que nos conectemos va a conseguir esta información
 automáticamente de nuestra parte. Sin problemas.
 
 
-## `listen()`---Will somebody please call me? {#listen}
+## `listen()` - ¿Alguien quiere llamarme, porfa? {#listen}
 
-[ixtt[listen()]] Ok, time for a change of pace. What if you don't want
-to connect to a remote host. Say, just for kicks, that you want to wait
-for incoming connections and handle them in some way. The process is two
-step: first you `listen()`, then you [ixtt[accept()]] `accept()` (see
-below).
+[ixtt[listen()]] OK, hora de cambiar el ritmo. ¿Qué pasa si no querés
+conectarte a un host remoto? Digamos, sólo por diversión, que querés
+esperar conexiones entrantes y manejarlas de algún modo. Ese proceso
+tiene dos pasos: primero hacés `listen()` (_escuchás_), y después
+[ixtt[accept()]] `accept()` (_aceptás_; mirá más abajo).
 
-The listen call is fairly simple, but requires a bit of explanation:
+La llamada `listen()` es bastante sencilla, pero requiere algo de
+explicación:
 
 ```{.c}
 int listen(int sockfd, int backlog); 
 ```
 
-`sockfd` is the usual socket file descriptor from the `socket()` system
-call.  [ix[listen()@\texttt{listen()}!backlog]] `backlog` is the number
-of connections allowed on the incoming queue. What does that mean? Well,
-incoming connections are going to wait in this queue until you
-`accept()` them (see below) and this is the limit on how many can queue
-up. Most systems silently limit this number to about 20; you can
-probably get away with setting it to `5` or `10`.
+`sockfd` es el descriptor de archivo socket de siempre, que nos devuelve
+la llamada a sistema `socket()`.
+[ix[listen()@\texttt{listen()}!backlog]] `backlog` es el número de
+conexiones que permitimos tener en la cola de entrada. ¿Qué significa
+eso? Bueno, las conexiones entrantes van a esperar en esta cola hasta
+que les hagas `accept()` (mirá más abajo), y este es el límite de
+cuántas pueden encolarse. La mayoría de los sistemas limitan este número
+alrededor de 20; probablemente puedas andar bien poniéndolo en `5` o
+`10`.
 
-Again, as per usual, `listen()` returns `-1` and sets `errno` on error.
+Una vez más, como de costumbre, `listen()` devuelve `-1` y asigna
+`errno` cuando hay errores.
 
-Well, as you can probably imagine, we need to call `bind()` before we
-call `listen()` so that the server is running on a specific port. (You
-have to be able to tell your buddies which port to connect to!)  So if
-you're going to be listening for incoming connections, the sequence of
-system calls you'll make is:
+Bueno, como te podrás imaginar, necesitamos llamara a `bind()` antes de
+llamar a `listen()` para que el servidor esté corriendo en un puerto
+específico (¡tenés que poder decirle al resto a qué puerto conectarse!).
+Así que si vas a estar aceptando conexiones entrantes, la secuencia de
+llamadas a sistema que vas a hacer es:
 
 ```{.c .numberLines}
 getaddrinfo();
 socket();
 bind();
 listen();
-/* accept() goes here */ 
+/* acá va accept() */ 
 ```
 
-I'll just leave that in the place of sample code, since it's fairly
-self-explanatory. (The code in the `accept()` section, below, is more
-complete.) The really tricky part of this whole sha-bang is the call to
-`accept()`.
+Sólo voy a dejar esto en lugar del código de ejemplo, porque es bastante
+auto-explicativa (el código en la sección de `accept()`, acá abajo, es
+más completo). La parte realmente complicada de todo este baile es la
+llamada a `accept()`.
 
 
 ## `accept()`---"Thank you for calling port 3490."
