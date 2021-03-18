@@ -1996,29 +1996,29 @@ que estaba escuchando, para evitar más conexiones entrantes en el mismo
 puerto, si quisieras.
 
 
-## `send()` and `recv()`---Talk to me, baby! {#sendrecv}
+## Enviar (`send()`) y recibir (`recv()`) - ¡Hablame, bebé! {#sendrecv}
 
-These two functions are for communicating over stream sockets or
-connected datagram sockets. If you want to use regular unconnected
-datagram sockets, you'll need to see the section on [`sendto()` and
-`recvfrom()`](#sendtorecv), below.
+Estas dos funciones sirven para comunicarse por sockets stream o sockets
+datagrama conectados. Si querés usar los sockets datagrama comunes,
+no conectados, vas a tener que ver la sección sobre [`sendto()` y
+`recvfrom()`](#sendtorecv) más abajo.
 
-[ixtt[send()]] The `send()` call:
+[ixtt[send()]] La llamada `send()`:
 
 ```{.c}
 int send(int sockfd, const void *msg, int len, int flags); 
 ```
 
-`sockfd` is the socket descriptor you want to send data to (whether it's
-the one returned by `socket()` or the one you got with `accept()`).
-`msg` is a pointer to the data you want to send, and `len` is the length
-of that data in bytes.  Just set `flags` to `0`. (See the `send()` man
-page for more information concerning flags.)
+`sockfd` es el descriptor de socket por el que querés mandar los datos
+(ya sea el que te devolvió `socket()` o el que conseguiste con
+`accept()`). `msg` es un puntero a los datos que querés enviar, y `len`
+es la longitud en bytes de esos datos. `flags` ponelo en `0` (mirá la
+página del manual de `send()` para más información sobre los flags).
 
-Some sample code might be:
+Un ejemplo de código podría ser así:
 
 ```{.c .numberLines}
-char *msg = "Beej was here!";
+char *msg = "¡Beej estuvo acá!";
 int len, bytes_sent;
 .
 .
@@ -2030,105 +2030,108 @@ bytes_sent = send(sockfd, msg, len, 0);
 . 
 ```
 
-`send()` returns the number of bytes actually sent out---_this might be
-less than the number you told it to send!_  See, sometimes you tell it
-to send a whole gob of data and it just can't handle it. It'll fire off
-as much of the data as it can, and trust you to send the rest later.
-Remember, if the value returned by `send()` doesn't match the value in
-`len`, it's up to you to send the rest of the string. The good news is
-this: if the packet is small (less than 1K or so) it will _probably_
-manage to send the whole thing all in one go.  Again, `-1` is returned
-on error, and `errno` is set to the error number.
+`send()` devuelve la cantidad de bytes que efectivamente envió - _¡puede
+ser menor que la cantidad que le pediste que envíe!_ Pasa que a veces le
+podés llegar a pedir que mande un choclazo de datos y no simplemente no
+pueda manejar todo eso. Va a enviar tantos datos como pueda, y confiar
+en que vos mandes el resto después. Acordate, si el valor que te
+devuelve `send()` no coincide con el valor en `len`, es tema tuyo mandar
+el resto de los datos. La buena noticia es esta: si el paquete es
+relativamente corto (menos de 1K, ponele) _probablemente_ pueda mandarlo
+todo de una. De nuevo, si hay errores, devuelve `-1` y setea `errno` con
+su número de error.
 
-[ixtt[recv()]] The `recv()` call is similar in many respects:
+[ixtt[recv()]] La llamada `recv()` se le parece bastante:
 
 ```{.c}
 int recv(int sockfd, void *buf, int len, int flags);
 ```
 
-`sockfd` is the socket descriptor to read from, `buf` is the buffer to
-read the information into, `len` is the maximum length of the buffer,
-and `flags` can again be set to `0`. (See the `recv()` man page for flag
-information.)
+`sockfd` es el descriptor de socket del que leer, `buf` es el buffer en
+que guardar la información leída, `len` es la longitud máxima del
+buffer, y `flags` otra vez podés simplemente ponerlo en `0` (mirá la
+página del manual de `recv()` para información de los flags).
 
-`recv()` returns the number of bytes actually read into the buffer, or
-`-1` on error (with `errno` set, accordingly).
+`recv()` devuelve el número de bytes que realmente logró leer al buffer,
+o `-1` cuando falla (y escribe `errno` de manera acorde).
 
-Wait! `recv()` can return `0`. This can mean only one thing: the remote
-side has closed the connection on you! A return value of `0` is
-`recv()`'s way of letting you know this has occurred.
+¡Momento! `recv()` puede devolver `0`. Eso sólo significa una única
+cosa: ¡el extremo remoto cerró la conexión con tu socket! Un valor de
+retorno `0` es la forma de `recv()` de avisarte que sucedió esto.
 
-There, that was easy, wasn't it? You can now pass data back and forth on
-stream sockets! Whee! You're a Unix Network Programmer!
+Ahí está: fue fácil, ¿eh? ¡Ya podés enviar y recibir información usando
+sockets stream! ¡Wiiiiii! ¡Ya sos un@ Programador@ de Redes Unix!
 
 
-## `sendto()` and `recvfrom()`---Talk to me, DGRAM-style {#sendtorecv}
+## `sendto()` y `recvfrom()` - Hablame, a-la-DGRAM {#sendtorecv}
 
-[ixtt[SOCK\_DGRAM]] "This is all fine and dandy," I hear you saying,
-"but where does this leave me with unconnected datagram sockets?" No
-problemo, amigo. We have just the thing.
+[ixtt[SOCK\_DGRAM]] "Muy lindo todo," te escucho decir, "¿pero qué onda
+con los sockets datagram no conectados?". Tranqui, panchi. Tenemos un
+_cosito_ para eso.
 
-Since datagram sockets aren't connected to a remote host, guess which
-piece of information we need to give before we send a packet? That's
-right! The destination address! Here's the scoop:
+Como los sockets datagram no se conectan a un host remoto, adiviná qué
+cachito de información tenemos que darle antes de enviar un paquete.
+¡Claro! ¡La dirección de destino! Esta es la firma:
 
 ```{.c}
 int sendto(int sockfd, const void *msg, int len, unsigned int flags,
            const struct sockaddr *to, socklen_t tolen); 
 ```
 
-As you can see, this call is basically the same as the call to `send()`
-with the addition of two other pieces of information. `to` is a pointer
-to a `struct sockaddr` (which will probably be another `struct
-sockaddr_in` or `struct sockaddr_in6` or `struct sockaddr_storage` that
-you cast at the last minute) which contains the destination [ix[IP]] IP
-address and [ix[port]] port.  `tolen`, an `int` deep-down, can simply be
-set to `sizeof *to` or `sizeof(struct sockaddr_storage)`.
+Como verás, la llamada es básicamente la misma que la de `send()`, pero
+con dos datos extra. `to` es un puntero a una `struct sockaddr` (que
+probablemente sea otra `struct sockaddr_in` o `struct sockaddr_in6` o
+`struct sockaddr_storage` que casteás justo antes de usarla) que
+contiene la [ix[IP]] dirección IP y el [ix[port]] puerto de destino.
+A `tolen`, que en el fondo no es más que un `int`, le podés asignar el
+`sizeof *to` o `sizeof(struct sockaddr_storage)`.
 
-To get your hands on the destination address structure, you'll probably
-either get it from `getaddrinfo()`, or from `recvfrom()`, below, or
-you'll fill it out by hand.
+La estructura de dirección de destino probablemente la saques de
+`getaddrinfo()`, o de `recvfrom()`, explicada más abajo, o la llenes a
+mano.
 
-Just like with `send()`, `sendto()` returns the number of bytes actually
-sent (which, again, might be less than the number of bytes you told it
-to send!), or `-1` on error.
+Igual que `send()`, `sendto()` devuelve la cantidad de bytes que
+realmente logró enviar (que, otra vez, podría ser menor al número que le
+pediste que envíe), o `-1` si hay un error.
 
-Equally similar are `recv()` and [ixtt[recvfrom()]] `recvfrom()`. The
-synopsis of `recvfrom()` is:
+Igualmente similares son `recv()` y [ixtt[recvfrom()]] `recvfrom()`. La
+sinopsis de `recvfrom()` es:
 
 ```{.c}
 int recvfrom(int sockfd, void *buf, int len, unsigned int flags,
              struct sockaddr *from, int *fromlen); 
 ```
 
-Again, this is just like `recv()` with the addition of a couple fields.
-`from` is a pointer to a local [ixtt[struct sockaddr]] `struct
-sockaddr_storage` that will be filled with the IP address and port of
-the originating machine. `fromlen` is a pointer to a local `int` that
-should be initialized to `sizeof *from` or `sizeof(struct
-sockaddr_storage)`. When the function returns, `fromlen` will contain
-the length of the address actually stored in `from`.
+De nuevo: es igual a `recv()`, pero con un par de campos extra. `from`
+es un puntero a una [ixtt[struct sockaddr]] `struct sockaddr_storage`
+local que va a llenarse con la dirección IP y el puerto de la máquina de
+origen. `fromlen` es un puntero a un `int` local que deberías
+inicializar a `sizeof *from` o `sizeof(struct sockaddr_storage)`. Cuando
+la función retorne, `fromlen` tendrá la longitud de la dirección
+realmente almacenada en `from`.
 
-`recvfrom()` returns the number of bytes received, or `-1` on error
-(with `errno` set accordingly).
+`recvfrom()` retorna el número de bytes recibidos, o `-1` si hay un
+error (y escribe `errno`).
 
-So, here's a question: why do we use `struct sockaddr_storage` as the
-socket type? Why not `struct sockaddr_in`? Because, you see, we want to
-not tie ourselves down to IPv4 or IPv6. So we use the generic `struct
-sockaddr_storage` which we know will be big enough for either.
+Así que, pregunta: ¿por qué usamos `struct sockaddr_storage` como tipo
+de socket? ¿Por qué no un `struct sockaddr_in`? Porque, verás, queremos
+evitar atarnos a IPv4 o IPv6. Así que usamos la estrructura genérica
+`struct sockaddr_storage`, que sabemos que es lo suficientemente grande
+para cualquiera de las dos.
 
-(So... here's another question: why isn't `struct sockaddr` itself big
-enough for any address? We even cast the general-purpose `struct
-sockaddr_storage` to the general-purpose `struct sockaddr`! Seems
-extraneous and redundant, huh. The answer is, it just isn't big enough,
-and I'd guess that changing it at this point would be Problematic. So
-they made a new one.)
+(Así que... Otra pregunta: ¿por qué no es la propia `struct sockaddr` lo
+suficientemente grande para cualquier dirección? ¡Incluso casteamos la 
+genérica `struct sockaddr_storage` a la genérica `struct sockaddr`!
+Parece extraño y redundante, eh. La respuesta es que simplemente no es
+lo suficientemente grande, y supongo que haberla cambiado a esta altura
+de la historia hubiera sido Problemático™. Así que hicieron una nueva.)
 
-Remember, if you [ix[connect()@\texttt{connect()}!on datagram sockets]]
-`connect()` a datagram socket, you can then simply use `send()` and
-`recv()` for all your transactions. The socket itself is still a
-datagram socket and the packets still use UDP, but the socket interface
-will automatically add the destination and source information for you.
+Acordate: si hacés [ix[connect()@\texttt{connect()}!on datagram sockets]]
+`connect()` a un socket datagrama, podés simplemente usar `send()` y
+`recv()` para todas tus transacciones. El socket sigue siendo un socket
+datagrama, y los paquetes van a seguir usando UDP, pero la interfaz de
+sockets va a agregar automáticamente la información de origen y destino
+por vos.
 
 
 ## `close()` and `shutdown()`---Get outta my face!
