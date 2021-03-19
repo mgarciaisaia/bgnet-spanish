@@ -2186,15 +2186,15 @@ Nada más.
 `closesocket()` en vez de a `close()`.)
 
 
-## `getpeername()`---Who are you?
+## `getpeername()` - ¿Y vos quién sos?
 
-[ixtt[getpeername()]] This function is so easy.
+[ixtt[getpeername()]] Esta función es muy fácil.
 
-It's so easy, I almost didn't give it its own section. But here it is
-anyway.
+Es tan fácil que casi no le doy su propia sección. Pero, ¡hey! Acá está,
+de todos modos.
 
-The function `getpeername()` will tell you who is at the other end of a
-connected stream socket. The synopsis:
+La función `getpeername()` te va a decir quién está del otro lado de un
+socket stream conectado. La sinopsis:
 
 ```{.c}
 #include <sys/socket.h>
@@ -2202,33 +2202,35 @@ connected stream socket. The synopsis:
 int getpeername(int sockfd, struct sockaddr *addr, int *addrlen); 
 ```
 
-`sockfd` is the descriptor of the connected stream socket, `addr` is a
-pointer to a `struct sockaddr` (or a `struct sockaddr_in`) that will
+`sockfd` es el descriptor del socket stream conectado, `addr` es un
+puntero a un `struct sockaddr` (o un `struct sockaddr_in`) que va a
+contener la información sobre el otro extremo de la conexión, y
 hold the information about the other side of the connection, and
-`addrlen` is a pointer to an `int`, that should be initialized to
-`sizeof *addr` or `sizeof(struct sockaddr)`.
+`addrlen` es un puntero a un `int`, que debería ser inicializado a
+`sizeof *addr` o `sizeof(struct sockaddr)`.
 
-The function returns `-1` on error and sets `errno` accordingly.
+Si falla, la función devuelve `-1` y escribe `errno`.
 
-Once you have their address, you can use [ixtt[inet\_ntop()]]
+Una vez que tenés su dirección, podés usar [ixtt[inet\_ntop()]]
 `inet_ntop()`, [ixtt[getnameinfo()]] `getnameinfo()`, or
-[ixtt[gethostbyaddr()]] `gethostbyaddr()` to print or get more
-information. No, you can't get their login name. (Ok, ok. If the other
-computer is running an ident daemon, this is possible. This, however, is
-beyond the scope of this document. Check out [flrfc[RFC 1413|1413]] for
-more info.)
+[ixtt[gethostbyaddr()]] `gethostbyaddr()` para imprimirla o conseguir
+más información. No, no podés conseguir su nombre de usuario. (Ok, ok.
+Si la otra computadora está corriendo un daemon ident, sería posible.
+Pero, de todos modos, eso está fuera del alcance de este documento. Mirá
+la [flrfc[RFC 1413|1413]] para más info.)
 
 
-## `gethostname()`---Who am I?
+## `gethostname()` - ¿Quién soy yo?
 
-[ixtt[gethostname()]] Even easier than `getpeername()` is the function
-`gethostname()`. It returns the name of the computer that your program
-is running on. The name can then be used by [ixtt[gethostbyname()]]
-`gethostbyname()`, below, to determine the [ix[IP]] IP address of your
-local machine.
+[ixtt[gethostname()]] Aún más fácil que `getpeername()` es la función
+`gethostname()`. Devuelve el nombre de red de la computadora en que está
+corriendo tu programa. Ese nombre lo podés usar con
+[ixtt[gethostbyname()]] `gethostbyname()`, debajo, para determinar la
+[ix[IP]] dirección IP de tu máquina local.
 
-What could be more fun? I could think of a few things, but they don't
-pertain to socket programming. Anyway, here's the breakdown:
+¿Hay algo más divertido que esto? Se me ocurren algunas cosas, pero no
+tienen nada que ver con programación de sockets. Como sea, así es la
+función:
 
 ```{.c}
 #include <unistd.h>
@@ -2236,12 +2238,12 @@ pertain to socket programming. Anyway, here's the breakdown:
 int gethostname(char *hostname, size_t size); 
 ```
 
-The arguments are simple: `hostname` is a pointer to an array of chars that will
-contain the hostname upon the function's return, and `size` is the length in
-bytes of the `hostname` array.
+Los parámetros son sencillos: `hostname` es un puntero a un array de
+caracteres que va a contener el nombre del host cuando la función
+retorne, y `size` es la longitud en bytes del array `hostname`.
 
-The function returns `0` on successful completion, and `-1` on error, setting
-`errno` as usual.
+La función devuelve `0` cuando resuelve exitosamente, y `-1` al haber un
+error, escribiendo `errno` como de costumbre.
 
 
 # Client-Server Background
