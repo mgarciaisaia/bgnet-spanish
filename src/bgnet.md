@@ -2134,56 +2134,56 @@ sockets va a agregar automáticamente la información de origen y destino
 por vos.
 
 
-## `close()` and `shutdown()`---Get outta my face!
+## `close()` y `shutdown()` - ¡Volá de acá!
 
-Whew! You've been `send()`ing and `recv()`ing data all day long, and
-you've had it. You're ready to close the connection on your socket
-descriptor. This is easy. You can just use the regular Unix file
-descriptor [ixtt[close()]] `close()` function:
+¡Fiú! Estuviste haciendo `send()` y `recv()` de datos todo el día, y ya
+fue suficiente. Ya estás para cerrar la conexión en tu socket
+descriptor. Es fácil. Podés simplemente usar la función [ixtt[close()]]
+`close()` estándar de los descriptores de archivos Unix:
 
 ```{.c}
 close(sockfd); 
 ```
 
-This will prevent any more reads and writes to the socket. Anyone
-attempting to read or write the socket on the remote end will receive an
-error.
+Esto evitará cualquier otra lectura o escritura en ese socket.
+Cualquiera que intente leer o escribir al socket en el extremo remoto va
+a recibir un error.
 
-Just in case you want a little more control over how the socket closes,
-you can use the [ixtt[shutdown()]] `shutdown()` function. It allows you
-to cut off communication in a certain direction, or both ways (just like
-`close()` does). Synopsis:
+Si quisieras tener un poco más de control sobre cómo se cierra el
+socket, podés usar la función [ixtt[shutdown()]] `shutdown()`. Esta te
+permite cortar la comunicación en una dirección dada, o en ambas
+direcciones (como hace `close()`). Sinopsis:
 
 ```{.c}
 int shutdown(int sockfd, int how); 
 ```
 
-`sockfd` is the socket file descriptor you want to shutdown, and `how`
-is one of the following:
+`sockfd` es el descriptor de socket que querés cerrar, y `how` es uno de
+estos:
 
-| `how` | Effect                                                     |
-|:-----:|------------------------------------------------------------|
-|  `0`  | Further receives are disallowed                            |
-|  `1`  | Further sends are disallowed                               |
-|  `2`  | Further sends and receives are disallowed (like `close()`) |
+| `how` | Efecto                                            |
+|:-----:|---------------------------------------------------|
+|  `0`  | No permite recibir más                            |
+|  `1`  | No permite enviar más                             |
+|  `2`  | No permite enviar ni recibir más (como `close()`) |
 
-`shutdown()` returns `0` on success, and `-1` on error (with `errno` set
-accordingly).
+`shutdown()` devuelve `0` cuando funciona, y `-1` al fallar (y escribe
+`errno`).
 
-If you deign to use `shutdown()` on unconnected datagram sockets, it
-will simply make the socket unavailable for further `send()` and
-`recv()` calls (remember that you can use these if you `connect()` your
-datagram socket).
+Si llegás a usar `shutdown()` en un socket datagram no conectado,
+simplemente hará que el socket no esté disponible para futuros `send()`
+y `recv()`s (acordate que podés usarlas si le hacés `connect()` a tu
+socket datagram).
 
-It's important to note that `shutdown()` doesn't actually close the file
-descriptor---it just changes its usability. To free a socket descriptor,
-you need to use `close()`.
+Es importante notar que `shutdown()` no hace el cierre propiamente dicho
+del descriptor de archivo - simplemente cambia su usabilidad. Para
+liberar al descriptor de socket, tenés que usar `close()`.
 
-Nothing to it.
+Nada más.
 
-(Except to remember that if you're using [ix[Windows]] Windows and
-[ix[Winsock]] Winsock that you should call [ixtt[closesocket()]]
-`closesocket()` instead of `close()`.)
+(Excepto recordar que si estás usando [ix[Windows]] Windows y
+[ix[Winsock]] Winsock deberías llamar a [ixtt[closesocket()]]
+`closesocket()` en vez de a `close()`.)
 
 
 ## `getpeername()`---Who are you?
