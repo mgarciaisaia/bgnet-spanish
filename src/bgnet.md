@@ -2246,31 +2246,31 @@ La función devuelve `0` cuando resuelve exitosamente, y `-1` al haber un
 error, escribiendo `errno` como de costumbre.
 
 
-# Client-Server Background
+# Trasfondo sobre Cliente-Servidor
 
-[ix[client/server]] It's a client-server world, baby. Just about
-everything on the network deals with client processes talking to server
-processes and vice-versa. Take `telnet`, for instance. When you connect
-to a remote host on port 23 with telnet (the client), a program on that
-host (called `telnetd`, the server) springs to life. It handles the
-incoming telnet connection, sets you up with a login prompt, etc.
+[ix[client/server]] Es un mundo cliente-servidor, che. Prácticamente
+todo en las redes trata de procesos clientes hablando a procesos
+servidores, y vice-versa. Fijate `telnet`, por ejemplo. Cuando te
+conectás a un equipo remoto en el puerto 23 con telnet (el cliente), un
+programa en ese equipo (llamado `telnetd`, el servidor) cobra vida. Ese
+proceso maneja tu conexión telnet entrante, te pregunta el login, etc.
 
-![Client-Server Interaction.](cs.pdf "[Client-Server Interaction Diagram]")
+![Interacción Cliente-Servidor.](cs.pdf "[Diagrama de interacción Cliente-Servidor]")
 
-The exchange of information between client and server is summarized in
-the above diagram.
+El intercambio de información entre cliente y servidor se resume en este
+diagrama.
 
-Note that the client-server pair can speak `SOCK_STREAM`, `SOCK_DGRAM`,
-or anything else (as long as they're speaking the same thing). Some good
-examples of client-server pairs are `telnet`/`telnetd`, `ftp`/`ftpd`, or
-`Firefox`/`Apache`. Every time you use `ftp`, there's a remote program,
-`ftpd`, that serves you.
+Notá que el par cliente-servidor puede hablar `SOCK_STREAM`,
+`SOCK_DGRAM`, o cualquier otra cosa - siempre y cuando hablen ambos la
+misma cosa. Algunos buenos ejemplos de pares cliente-servidor son
+`telnet`/`telnetd`, `ftp`/`ftpd`, o `Firefox`/`Apache`. Cada vez que
+usás `ftp`, hay un programa remoto, `ftpd`, que te sirve.
 
-Often, there will only be one server on a machine, and that server will
-handle multiple clients using [ixtt[fork()]] `fork()`. The basic routine
-is: server will wait for a connection, `accept()` it, and `fork()` a
-child process to handle it. This is what our sample server does in the
-next section.
+A menudo habrá un único servidor en una máquina, y ese servidor manejará
+múltiples clientes usando [ixtt[fork()]] `fork()`. La rutina básica es:
+el servidor espera una conexión, la acepta (`accept()`), y hace `fork()`
+a un proceso hijo que la maneje. Eso es lo que hace nuestro servidor de
+ejemplo en la próxima sección.
 
 
 ## A Simple Stream Server
