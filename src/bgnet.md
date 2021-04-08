@@ -148,7 +148,7 @@ y ¡actualicé la Guía para IPv6! ¡Que la disfrutes!
 Este documento fue escrito como un tutorial, no como una referencia
 completa. Probablemente lo aprovechen mejor quienes estén empezando a
 programar con sockets y estén buscando un punto de apoyo. Bajo ningún
-punto de vista es la gúia _completa y total_ de programación de
+punto de vista es la guía _completa y total_ de programación de
 sockets.
 
 Dicho esto, con algo de suerte es más que suficiente como para que esas
@@ -277,7 +277,7 @@ sockets. El código para hacerlo tiene esta pinta:
 
 {
     WSADATA wsaData;   // si esto no funciona
-    //WSAData wsaData; // proba esto otro en cambio
+    //WSAData wsaData; // proba con esto otro
 
     // MAKEWORD(1,1) para Winsock 1.1, MAKEWORD(2,0) para Winsock 2.0:
 
@@ -544,13 +544,13 @@ Internet" (por sus siglas en inglés; mirá la [flrfc[RFC 791|791]]). IP
 se encarga principalmente del routeo en Internet, y no se encarga de la
 integridad de los datos.
 
-Piola. [ix[socket!datagram]] ¿Y qué hay de los sockets datagrama? ¿Por
+Piola. [ix[socket!datagram]] ¿Y qué hay de los sockets datagram? ¿Por
 qué se los llama sockets "no conectados"? ¿De qué va todo esto? ¿Por qué
 no son confiables? Bueno, estos son algunos hechos: si enviás un
-datagrama, puede que llegue. Puede que llegue fuera de orden. Si llega,
+datagram, puede que llegue. Puede que llegue fuera de orden. Si llega,
 los datos dentro del paquete van a llegar libres de errores.
 
-Los sockets datagrama también usan IP para routear, pero no usan TCP;
+Los sockets datagram también usan IP para routear, pero no usan TCP;
 usan el "Protocolo de Datagramas de Usuario", o [ix[UDP]] "UDP" (por sus
 siglas en inglés; mirá la [flrfc[RFC 768|768]]).
 
@@ -640,7 +640,7 @@ Recordalas para tus exámenes de redes:
 * Transporte
 * Red
 * Enlace de datos
-* Físico
+* Física
 
 La capa física es el hardware (serie, Ethernet, etc.). La capa de
 aplicación es lo más lejano a la capa física que puedas imaginar - es
@@ -805,10 +805,10 @@ dirección IP, y que el resto es la _porción del host_".
 Por ejemplo, con IPv4, podés tener `192.0.2.12`, y podríamos decir que
 los primeros 3 bytes son la red y el último byte son el host. O, dicho
 de otra forma, estamos hablando del host `12` en la red `192.0.2.0`
-(fijate cómo anulamos el bye que era del host).
+(fijate cómo anulamos el byte que era del host).
 
 Y ahora, ¡sigamos con más información desactualizada! ¿List@? En los
-Tiempos Antigüos, había tres "clases" de subredes, donde uno, dos o los
+Tiempos Antiguos, había tres "clases" de subredes, donde uno, dos o los
 tres primeros bytes de la dirección eran la parte de la red. Si tenías
 la suerte de tener un byte para la red y tres para el host, podías tener
 24 bits de hosts en tu red (unos 16 millones). Eso era una red "clase
@@ -831,7 +831,7 @@ quedando sin redes Clase C bastante rápido, y ya nos habíamos quedado
 sin Clases A hacía rato, así que ni preguntes. Para remediarlo, Los
 Poderes permitieron que la máscara de red sea de cualquier cantidad
 arbitraria de bits, no sólo 8, 16 o 24. Entonces podés tener una máscara
-de, digamos, `255.255.255.252`, que seríaan 30 bits de red y 2 bits de
+de, digamos, `255.255.255.252`, que serían 30 bits de red y 2 bits de
 host, permitiendo 4 hosts en la red (notá que la máscara de red
 _SIEMPRE_ es un montón de bits 1 seguido por otro montón de bits 0).
 
@@ -1156,7 +1156,7 @@ manipular [ix[IP]] direcciones IP. No hace interpretarlas manualmente y
 meter todo en un `long` con el operador `<<`.
 
 Primero, digamos que tenés una `struct sockaddr_in ina`, y tenés una
-dirección IP "`10.12.110.57`" or "`2001:db8:63b3:1::3490`" que querés
+dirección IP "`10.12.110.57`" o "`2001:db8:63b3:1::3490`" que querés
 almacenar en ella. La función que querés usar, [ixtt[inet\_pton()]]
 `inet_pton()`, convierte una dirección IP en notación números-y-puntos a
 una `struct in_addr` o `struct in6_addr` dependiendo de si le
@@ -1198,7 +1198,7 @@ struct sockaddr_in sa;      // supongamos que esto tiene valores cargados
 
 inet_ntop(AF_INET, &(sa.sin_addr), ip4, INET_ADDRSTRLEN);
 
-printf("La dirección IPv4 es: %s\n", ip4);
+printf("La direccion IPv4 es: %s\n", ip4);
 
 
 // IPv6:
@@ -1208,7 +1208,7 @@ struct sockaddr_in6 sa6;    // supongamos que esto tiene valores cargados
 
 inet_ntop(AF_INET6, &(sa6.sin6_addr), ip6, INET6_ADDRSTRLEN);
 
-printf("La dirección es: %s\n", ip6);
+printf("La direccion IPv6 es: %s\n", ip6);
 ```
 
 Cuando la llames, le vas a pasar el tipo de dirección (IPv4 o IPv6), la
@@ -1411,7 +1411,7 @@ int getaddrinfo(const char *node,     // e.g. "www.example.com" o IP
                 struct addrinfo **res);
 ```
 
-Le dás tres parámetros de entrada a la función, y te devuelve un puntero
+Le das tres parámetros de entrada a la función, y te devuelve un puntero
 a una lista enlazada, `res`, de resultados.
 
 El parámetro `node` ("nodo") es el nombre de host al que conectarse, o
@@ -1498,7 +1498,7 @@ status = getaddrinfo("www.example.net", "3490", &hints, &servinfo);
 ```
 
 Sigo insistiendo con que `servinfo` es una lista enlazada con distintos
-tipos de información de direcciones. Escribamos rápidaamente un programa
+tipos de información de direcciones. Escribamos rápidamente un programa
 de ejemplo para mostrar esta información. [flx[Este pequeño
 programa|showip.c]] va a imprimir las direcciones IP del host que sea
 que especifiques en la línea de comandos:
@@ -1607,7 +1607,7 @@ int socket(int domain, int type, int protocol);
 ```
 
 Pero, ¿qué son estos parámetros? Te permiten decir qué tipo de socket
-querés (IPv4 o IPv6, stream o datagrama, y TCP o UDP).
+querés (IPv4 o IPv6, stream o datagram, y TCP o UDP).
 
 La gente solía hardcodear estos valores, y de hecho todavía podés
 hacerlo (`domain` es `PF_INET` o `PF_INET6`, `type` es `SOCK_STREAM` o
@@ -1780,14 +1780,14 @@ if (setsockopt(listener,SOL_SOCKET,SO_REUSEADDR,&yes,sizeof yes) == -1) {
 [ixtt[bind()]] Un último comentario sobre `bind()`: hay veces en que no
 necesitás llamarla. Si vas a hacer [ixtt[connect()]] `connect()` a una
 máquina remota y no te importa desde qué puerto local (como el caso de
-`telnet`, en que sólo te importa el puerto remoto), podés llamara a
+`telnet`, en que sólo te importa el puerto remoto), podés llamar a
 `connect()` directamente, que mirará que el socket no está bindeado y lo
 `bind()`eará a un puerto local libre si fuera necesario.
 
 
 ## `connect()` - ¡Hey, vos! {#connect}
 
-[ixtt[connect()]] Hagamos de cuenta por unos minutos que sos la
+[ixtt[connect()]] Hagamos de cuenta por unos minutos que sos una
 aplicación telnet. Tu usuari@ te ordena (como en la película [ix[TRON]]
 _TRON_) que consigas un descriptor de archivo socket. Vos cumplís y
 llamás a `socket()`. Luego, tu usuari@ te dice que te conectes a
@@ -1808,7 +1808,7 @@ int connect(int sockfd, struct sockaddr *serv_addr, int addrlen);
 ```
 
 `sockfd` es nuestro ya amigo descriptor de archivo socket, devuelto por
-la llamada `socket()`; `serv_addr` es un `struct sockadder` que contiene
+la llamada `socket()`; `serv_addr` es un `struct sockaddr` que contiene
 la dirección IP y puerto destino, y `addrlen` es la longitud en bytes de
 esa estructura con la dirección del servidor.
 
@@ -1887,7 +1887,7 @@ alrededor de 20; probablemente puedas andar bien poniéndolo en `5` o
 Una vez más, como de costumbre, `listen()` devuelve `-1` y asigna
 `errno` cuando hay errores.
 
-Bueno, como te podrás imaginar, necesitamos llamara a `bind()` antes de
+Bueno, como te podrás imaginar, necesitamos llamar a `bind()` antes de
 llamar a `listen()` para que el servidor esté corriendo en un puerto
 específico (¡tenés que poder decirle al resto a qué puerto conectarse!).
 Así que si vas a estar aceptando conexiones entrantes, la secuencia de
@@ -1940,7 +1940,7 @@ ella vas a poder determinar qué host te está llamando desde qué puerto).
 reflejarlo.
 
 Adiviná qué. `accept()` devuelve `-1` y escribe `errno` si ocurre un
-error. ¡No te la esperabas, ¿eh?!
+error. No te la esperabas, ¿eh?
 
 Como antes, es un montón para absorber de una, así que acá hay un
 fragmento de código de ejemplo para tu deleite:
@@ -1999,7 +1999,7 @@ puerto, si quisieras.
 ## Enviar (`send()`) y recibir (`recv()`) - ¡Hablame, bebé! {#sendrecv}
 
 Estas dos funciones sirven para comunicarse por sockets stream o sockets
-datagrama conectados. Si querés usar los sockets datagrama comunes,
+datagram conectados. Si querés usar los sockets datagram comunes,
 no conectados, vas a tener que ver la sección sobre [`sendto()` y
 `recvfrom()`](#sendtorecv) más abajo.
 
@@ -2115,7 +2115,7 @@ error (y escribe `errno`).
 
 Así que, pregunta: ¿por qué usamos `struct sockaddr_storage` como tipo
 de socket? ¿Por qué no un `struct sockaddr_in`? Porque, verás, queremos
-evitar atarnos a IPv4 o IPv6. Así que usamos la estrructura genérica
+evitar atarnos a IPv4 o IPv6. Así que usamos la estructura genérica
 `struct sockaddr_storage`, que sabemos que es lo suficientemente grande
 para cualquiera de las dos.
 
@@ -2127,9 +2127,9 @@ lo suficientemente grande, y supongo que haberla cambiado a esta altura
 de la historia hubiera sido Problemático™. Así que hicieron una nueva.)
 
 Acordate: si hacés [ix[connect()@\texttt{connect()}!on datagram sockets]]
-`connect()` a un socket datagrama, podés simplemente usar `send()` y
+`connect()` a un socket datagram, podés simplemente usar `send()` y
 `recv()` para todas tus transacciones. El socket sigue siendo un socket
-datagrama, y los paquetes van a seguir usando UDP, pero la interfaz de
+datagram, y los paquetes van a seguir usando UDP, pero la interfaz de
 sockets va a agregar automáticamente la información de origen y destino
 por vos.
 
@@ -2205,14 +2205,13 @@ int getpeername(int sockfd, struct sockaddr *addr, int *addrlen);
 `sockfd` es el descriptor del socket stream conectado, `addr` es un
 puntero a un `struct sockaddr` (o un `struct sockaddr_in`) que va a
 contener la información sobre el otro extremo de la conexión, y
-hold the information about the other side of the connection, and
 `addrlen` es un puntero a un `int`, que debería ser inicializado a
 `sizeof *addr` o `sizeof(struct sockaddr)`.
 
 Si falla, la función devuelve `-1` y escribe `errno`.
 
 Una vez que tenés su dirección, podés usar [ixtt[inet\_ntop()]]
-`inet_ntop()`, [ixtt[getnameinfo()]] `getnameinfo()`, or
+`inet_ntop()`, [ixtt[getnameinfo()]] `getnameinfo()`, o
 [ixtt[gethostbyaddr()]] `gethostbyaddr()` para imprimirla o conseguir
 más información. No, no podés conseguir su nombre de usuario. (Ok, ok.
 Si la otra computadora está corriendo un daemon ident, sería posible.
@@ -2291,7 +2290,7 @@ corriendo.
 
 ```{.c .numberLines}
 /*
-** server.c -- demo de un socket stream servidor
+** server.c -- demostración de un servidor socket stream
 */
 
 #include <stdio.h>
@@ -2322,7 +2321,7 @@ void sigchld_handler(int s)
 }
 
 
-// conseguir el sockaddr, IPv4 o IPv6:
+// consigue el sockaddr, IPv4 o IPv6:
 void *get_in_addr(struct sockaddr *sa)
 {
     if (sa->sa_family == AF_INET) {
@@ -2357,7 +2356,7 @@ int main(void)
     for(p = servinfo; p != NULL; p = p->ai_next) {
         if ((sockfd = socket(p->ai_family, p->ai_socktype,
                 p->ai_protocol)) == -1) {
-            perror("server: socket");
+            perror("servidor: socket");
             continue;
         }
 
@@ -2369,7 +2368,7 @@ int main(void)
 
         if (bind(sockfd, p->ai_addr, p->ai_addrlen) == -1) {
             close(sockfd);
-            perror("server: bind");
+            perror("servidor: bind");
             continue;
         }
 
@@ -2379,7 +2378,7 @@ int main(void)
     freeaddrinfo(servinfo); // listo con esta estructura
 
     if (p == NULL)  {
-        fprintf(stderr, "server: failed to bind\n");
+        fprintf(stderr, "servidor: no se pudo hacer bind\n");
         exit(1);
     }
 
@@ -2388,7 +2387,7 @@ int main(void)
         exit(1);
     }
 
-    sa.sa_handler = sigchld_handler; // terminar todos los subprocesos muertos
+    sa.sa_handler = sigchld_handler; // termina todos los subprocesos muertos
     sigemptyset(&sa.sa_mask);
     sa.sa_flags = SA_RESTART;
     if (sigaction(SIGCHLD, &sa, NULL) == -1) {
@@ -2396,9 +2395,9 @@ int main(void)
         exit(1);
     }
 
-    printf("server: waiting for connections...\n");
+    printf("servidor: esperando por conexiones...\n");
 
-    while(1) {  // main accept() loop
+    while(1) {  // bucle principal de accept()
         sin_size = sizeof their_addr;
         new_fd = accept(sockfd, (struct sockaddr *)&their_addr, &sin_size);
         if (new_fd == -1) {
@@ -2409,7 +2408,7 @@ int main(void)
         inet_ntop(their_addr.ss_family,
             get_in_addr((struct sockaddr *)&their_addr),
             s, sizeof s);
-        printf("server: got connection from %s\n", s);
+        printf("servidor: se obtuvo una conexion desde %s\n", s);
 
         if (!fork()) { // este es el proceso hijo
             close(sockfd); // el hijo no necesita el socket que escucha
@@ -2440,7 +2439,7 @@ Podés leer los datos que envía este servidor usando el cliente que está
 en la siguiente sección.
 
 
-## Un servidor stream sencillo
+## Un cliente stream sencillo
 
 [ix[client!stream]] Este amigo es todavía más fácil que el servidor.
 Todo lo que hace este cliente es conectarse al servidor que especifiques
@@ -2451,7 +2450,7 @@ servidor.
 
 ```{.c .numberLines}
 /*
-** client.c -- demo de un socket stream servidor
+** client.c -- demostracion de un cliente socket stream
 */
 
 #include <stdio.h>
@@ -2470,7 +2469,7 @@ servidor.
 
 #define MAXDATASIZE 100 // cantidad maxima de bytes que podemos recibir por vez
 
-// conseguir la sockaddr, IPv4 o IPv6:
+// consigue la sockaddr, IPv4 o IPv6:
 void *get_in_addr(struct sockaddr *sa)
 {
     if (sa->sa_family == AF_INET) {
@@ -2489,7 +2488,7 @@ int main(int argc, char *argv[])
     char s[INET6_ADDRSTRLEN];
 
     if (argc != 2) {
-        fprintf(stderr,"usage: client hostname\n");
+        fprintf(stderr,"uso: client hostname\n");
         exit(1);
     }
 
@@ -2506,13 +2505,13 @@ int main(int argc, char *argv[])
     for(p = servinfo; p != NULL; p = p->ai_next) {
         if ((sockfd = socket(p->ai_family, p->ai_socktype,
                 p->ai_protocol)) == -1) {
-            perror("client: socket");
+            perror("cliente: socket");
             continue;
         }
 
         if (connect(sockfd, p->ai_addr, p->ai_addrlen) == -1) {
             close(sockfd);
-            perror("client: connect");
+            perror("cliente: connect");
             continue;
         }
 
@@ -2520,13 +2519,13 @@ int main(int argc, char *argv[])
     }
 
     if (p == NULL) {
-        fprintf(stderr, "client: failed to connect\n");
+        fprintf(stderr, "cliente: no se pudo hacer connect\n");
         return 2;
     }
 
     inet_ntop(p->ai_family, get_in_addr((struct sockaddr *)p->ai_addr),
             s, sizeof s);
-    printf("client: connecting to %s\n", s);
+    printf("cliente: conectandose a %s\n", s);
 
     freeaddrinfo(servinfo); // listo con esta estructura
 
@@ -2537,7 +2536,7 @@ int main(int argc, char *argv[])
 
     buf[numbytes] = '\0';
 
-    printf("client: received '%s'\n",buf);
+    printf("cliente: se recibio '%s'\n",buf);
 
     close(sockfd);
 
