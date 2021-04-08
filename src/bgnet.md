@@ -2273,23 +2273,25 @@ a un proceso hijo que la maneje. Eso es lo que hace nuestro servidor de
 ejemplo en la próxima sección.
 
 
-## A Simple Stream Server
+## Un servidor stream sencillo
 
-[ix[server!stream]] All this server does is send the string "`Hello,
-world!`" out over a stream connection. All you need to do to test this
-server is run it in one window, and telnet to it from another with:
+[ix[server!stream]] Todo lo que hace este servidor es enviar la cadena
+"`Hello, world!`" por una conexión stream. Todo lo que tenés que hacer
+para probarlo es correrlo en una ventana, y conectártele por telnet
+desde otra con:
 
 ```
 $ telnet remotehostname 3490
 ```
 
-where `remotehostname` is the name of the machine you're running it on.
+donde `remotehostname` es el nombre de la máquina en que lo estás
+corriendo.
 
-[flx[The server code|server.c]]:
+[flx[El código del servidor|server.c]]:
 
 ```{.c .numberLines}
 /*
-** server.c -- a stream socket server demo
+** server.c -- demo de un socket stream servidor
 */
 
 #include <stdio.h>
@@ -2305,13 +2307,13 @@ where `remotehostname` is the name of the machine you're running it on.
 #include <sys/wait.h>
 #include <signal.h>
 
-#define PORT "3490"  // the port users will be connecting to
+#define PORT "3490"  // el puerto al que se van a conectar los usuarios
 
-#define BACKLOG 10   // how many pending connections queue will hold
+#define BACKLOG 10   // cuantas conexiones pendientes mantener en cola
 
 void sigchld_handler(int s)
 {
-    // waitpid() might overwrite errno, so we save and restore it:
+    // waitpid() puede pisar errno, asi que lo guardamos y luego lo restauramos
     int saved_errno = errno;
 
     while(waitpid(-1, NULL, WNOHANG) > 0);
@@ -2320,7 +2322,7 @@ void sigchld_handler(int s)
 }
 
 
-// get sockaddr, IPv4 or IPv6:
+// conseguir el sockaddr, IPv4 o IPv6:
 void *get_in_addr(struct sockaddr *sa)
 {
     if (sa->sa_family == AF_INET) {
@@ -2332,9 +2334,9 @@ void *get_in_addr(struct sockaddr *sa)
 
 int main(void)
 {
-    int sockfd, new_fd;  // listen on sock_fd, new connection on new_fd
+    int sockfd, new_fd;  // en sock_fd escucha, new_fd son las nuevas conexiones
     struct addrinfo hints, *servinfo, *p;
-    struct sockaddr_storage their_addr; // connector's address information
+    struct sockaddr_storage their_addr; // informacion de direccion de quien se conecte
     socklen_t sin_size;
     struct sigaction sa;
     int yes=1;
@@ -2344,14 +2346,14 @@ int main(void)
     memset(&hints, 0, sizeof hints);
     hints.ai_family = AF_UNSPEC;
     hints.ai_socktype = SOCK_STREAM;
-    hints.ai_flags = AI_PASSIVE; // use my IP
+    hints.ai_flags = AI_PASSIVE; // usa mi IP
 
     if ((rv = getaddrinfo(NULL, PORT, &hints, &servinfo)) != 0) {
         fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(rv));
         return 1;
     }
 
-    // loop through all the results and bind to the first we can
+    // recorre todos los resultados y hace bind al primero que pueda
     for(p = servinfo; p != NULL; p = p->ai_next) {
         if ((sockfd = socket(p->ai_family, p->ai_socktype,
                 p->ai_protocol)) == -1) {
@@ -2374,7 +2376,7 @@ int main(void)
         break;
     }
 
-    freeaddrinfo(servinfo); // all done with this structure
+    freeaddrinfo(servinfo); // listo con esta estructura
 
     if (p == NULL)  {
         fprintf(stderr, "server: failed to bind\n");
@@ -2386,7 +2388,7 @@ int main(void)
         exit(1);
     }
 
-    sa.sa_handler = sigchld_handler; // reap all dead processes
+    sa.sa_handler = sigchld_handler; // terminar todos los subprocesos muertos
     sigemptyset(&sa.sa_mask);
     sa.sa_flags = SA_RESTART;
     if (sigaction(SIGCHLD, &sa, NULL) == -1) {
@@ -2409,45 +2411,47 @@ int main(void)
             s, sizeof s);
         printf("server: got connection from %s\n", s);
 
-        if (!fork()) { // this is the child process
-            close(sockfd); // child doesn't need the listener
+        if (!fork()) { // este es el proceso hijo
+            close(sockfd); // el hijo no necesita el socket que escucha
             if (send(new_fd, "Hello, world!", 13, 0) == -1)
                 perror("send");
             close(new_fd);
             exit(0);
         }
-        close(new_fd);  // parent doesn't need this
+        close(new_fd);  // el padre no necesita el socket nuevo
     }
 
     return 0;
 }
 ```
 
-In case you're curious, I have the code in one big `main()` function for
-(I feel) syntactic clarity. Feel free to split it into smaller functions
-if it makes you feel better.
+Si te interesa, tengo todo el código en una gran función `main()` por
+(lo que yo considero) claridad sintáctica. Sentite libre de dividirlo en
+funciones más chicas si eso te hace sentir mejor.
 
-(Also, this whole [ixtt[sigaction()]] `sigaction()` thing might be new
-to you---that's ok. The code that's there is responsible for reaping
-[ix[zombie process]] zombie processes that appear as the `fork()`ed
-child processes exit. If you make lots of zombies and don't reap them,
-your system administrator will become agitated.)
+(Además, todo esto del [ixtt[sigaction()]] `sigaction()` puede que te
+sea nuevo - todo bien. El código que está ahí se encarga de terminar los
+[ix[zombie process]] procesos zombies que aparecen a medida que los
+procesos hijos `fork()`eados finalizan. Si creás muchos procesos zombies
+y no los terminás, tu administrador@ del sistema se va a poner
+nervios@).
 
-You can get the data from this server by using the client listed in the
-next section.
+Podés leer los datos que envía este servidor usando el cliente que está
+en la siguiente sección.
 
 
-## A Simple Stream Client
+## Un servidor stream sencillo
 
-[ix[client!stream]] This guy's even easier than the server. All this
-client does is connect to the host you specify on the command line, port
-3490. It gets the string that the server sends.
+[ix[client!stream]] Este amigo es todavía más fácil que el servidor.
+Todo lo que hace este cliente es conectarse al servidor que especifiques
+por línea de comando, al puerto 3490, y lee el string que le envía el
+servidor.
 
-[flx[The client source|client.c]]:
+[flx[El código del cliente|client.c]]:
 
 ```{.c .numberLines}
 /*
-** client.c -- a stream socket client demo
+** client.c -- demo de un socket stream servidor
 */
 
 #include <stdio.h>
@@ -2462,11 +2466,11 @@ client does is connect to the host you specify on the command line, port
 
 #include <arpa/inet.h>
 
-#define PORT "3490" // the port client will be connecting to 
+#define PORT "3490" // el puerto al que se va a conectar el cliente
 
-#define MAXDATASIZE 100 // max number of bytes we can get at once 
+#define MAXDATASIZE 100 // cantidad maxima de bytes que podemos recibir por vez
 
-// get sockaddr, IPv4 or IPv6:
+// conseguir la sockaddr, IPv4 o IPv6:
 void *get_in_addr(struct sockaddr *sa)
 {
     if (sa->sa_family == AF_INET) {
@@ -2498,7 +2502,7 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    // loop through all the results and connect to the first we can
+    // recorre todos los resultados y hace bind al primero que pueda
     for(p = servinfo; p != NULL; p = p->ai_next) {
         if ((sockfd = socket(p->ai_family, p->ai_socktype,
                 p->ai_protocol)) == -1) {
@@ -2524,7 +2528,7 @@ int main(int argc, char *argv[])
             s, sizeof s);
     printf("client: connecting to %s\n", s);
 
-    freeaddrinfo(servinfo); // all done with this structure
+    freeaddrinfo(servinfo); // listo con esta estructura
 
     if ((numbytes = recv(sockfd, buf, MAXDATASIZE-1, 0)) == -1) {
         perror("recv");
@@ -2541,9 +2545,9 @@ int main(int argc, char *argv[])
 }
 ```
 
-Notice that if you don't run the server before you run the client,
-`connect()` returns [ix[Connection refused]] "Connection refused". Very
-useful.
+Fijate que si no corrés el servidor antes que el cliente, `connect()`
+devuelve [ix[Connection refused]] "Connection refused" (conexión
+rechazada). Muy útil.
 
 
 ## Datagram Sockets {#datagram}
